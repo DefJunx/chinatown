@@ -20,7 +20,7 @@ export interface Order {
   customerPhone: string;
   items: CartItem[];
   totalPrice: number;
-  status: 'pending' | 'consolidated' | 'completed';
+  status: "pending" | "consolidated" | "completed";
   createdAt: number;
 }
 
@@ -29,8 +29,7 @@ export interface ConsolidatedOrder {
   orderIds: string[];
   items: { [key: string]: { name: string; quantity: number; price: number } };
   totalPrice: number;
-  status: 'pending' | 'completed';
+  status: "pending" | "completed";
   createdAt: number;
   adminId: string;
 }
-

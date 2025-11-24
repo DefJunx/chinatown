@@ -1,13 +1,13 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { CartProvider } from '@/contexts/CartContext';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { CartProvider } from "@/contexts/CartContext";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Chinese Takeaway - Order Online',
-  description: 'Order delicious Chinese food online',
+  title: "Chinese Takeaway - Order Online",
+  description: "Order delicious Chinese food online",
 };
 
 export default function RootLayout({
@@ -23,4 +23,3 @@ export default function RootLayout({
     </html>
   );
 }
-

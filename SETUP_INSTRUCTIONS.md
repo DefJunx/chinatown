@@ -72,7 +72,7 @@ The application will be available at http://localhost:3000
 1. **Browse Menu**: View all dishes organized by category
 2. **Search**: Find dishes by name with real-time filtering
 3. **Category Filter**: Filter dishes by category
-4. **Shopping Cart**: 
+4. **Shopping Cart**:
    - Add items with one click
    - Adjust quantities
    - Remove items
@@ -83,7 +83,7 @@ The application will be available at http://localhost:3000
 
 1. **View Orders**: Real-time list of all orders (pending, consolidated, completed)
 2. **Select Multiple Orders**: Use checkboxes to select orders
-3. **Consolidate Orders**: 
+3. **Consolidate Orders**:
    - Combine multiple orders into one
    - Automatically aggregates duplicate items
    - Shows consolidated quantities
@@ -96,6 +96,7 @@ The application will be available at http://localhost:3000
 The application uses InstantDB with the following collections:
 
 ### Orders Collection
+
 - `customerName`: String
 - `customerPhone`: String
 - `items`: Array of items with id, name, price, quantity, category
@@ -104,6 +105,7 @@ The application uses InstantDB with the following collections:
 - `createdAt`: Timestamp
 
 ### Consolidated Orders Collection
+
 - `orderIds`: Array of original order IDs
 - `items`: Map of item ID to {name, quantity, price}
 - `totalPrice`: Number
@@ -181,10 +183,10 @@ Edit `lib/menu-data.ts` to add, remove, or modify dishes:
 ## Support
 
 For issues related to:
+
 - InstantDB: Check https://instantdb.com/docs
 - Next.js: Check https://nextjs.org/docs
 
 ## License
 
 This project is created for educational and commercial use.
-

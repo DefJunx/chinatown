@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React, { useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { db } from '@/lib/instant';
+import React, { useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { db } from "@/lib/instant";
 
 export default function AdminLayout({
   children,
@@ -15,32 +15,31 @@ export default function AdminLayout({
 
   useEffect(() => {
     // Allow access to login and setup pages without authentication
-    const publicPaths = ['/admin/login', '/admin/setup'];
+    const publicPaths = ["/admin/login", "/admin/setup"];
     if (publicPaths.includes(pathname)) {
       return;
     }
 
     // Redirect to login if not authenticated
     if (!isLoading && !user) {
-      router.push('/admin/login');
+      router.push("/admin/login");
     }
   }, [isLoading, user, router, pathname]);
 
   // Show loading state while checking auth
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="text-gray-600">Loading...</div>
       </div>
     );
   }
 
   // For protected routes, show nothing until auth is confirmed
-  const publicPaths = ['/admin/login', '/admin/setup'];
+  const publicPaths = ["/admin/login", "/admin/setup"];
   if (!publicPaths.includes(pathname) && !user) {
     return null;
   }
 
   return <>{children}</>;
 }
-

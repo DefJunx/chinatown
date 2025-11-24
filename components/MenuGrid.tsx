@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo } from 'react';
-import { SearchBar } from './SearchBar';
-import { DishCard } from './DishCard';
-import { menuData, getAllCategories } from '@/lib/menu-data';
+import React, { useState, useMemo } from "react";
+import { SearchBar } from "./SearchBar";
+import { DishCard } from "./DishCard";
+import { menuData, getAllCategories } from "@/lib/menu-data";
 
 export const MenuGrid: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   const categories = getAllCategories();
 
@@ -16,7 +16,7 @@ export const MenuGrid: React.FC = () => {
     return menuData
       .map((category) => {
         // Filter by category
-        if (selectedCategory !== 'All' && category.name !== selectedCategory) {
+        if (selectedCategory !== "All" && category.name !== selectedCategory) {
           return null;
         }
 
@@ -47,17 +47,19 @@ export const MenuGrid: React.FC = () => {
       />
 
       {filteredMenuData.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 text-lg">No dishes found matching your criteria.</p>
+        <div className="py-12 text-center">
+          <p className="text-lg text-gray-500">
+            No dishes found matching your criteria.
+          </p>
         </div>
       ) : (
         <div className="space-y-8">
           {filteredMenuData.map((category) => (
             <div key={category!.name}>
-              <h2 className="text-3xl font-bold text-primary-800 mb-4 pb-2 border-b-2 border-primary-600">
+              <h2 className="mb-4 border-b-2 border-primary-600 pb-2 text-3xl font-bold text-primary-800">
                 {category!.name}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {category!.items.map((item) => (
                   <DishCard key={item.id} item={item} />
                 ))}
@@ -69,4 +71,3 @@ export const MenuGrid: React.FC = () => {
     </div>
   );
 };
-

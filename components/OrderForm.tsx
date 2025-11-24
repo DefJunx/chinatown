@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { useCart } from '@/contexts/CartContext';
-import { db } from '@/lib/instant';
-import { id } from '@instantdb/react';
-import { X } from 'lucide-react';
+import React, { useState } from "react";
+import { useCart } from "@/contexts/CartContext";
+import { db } from "@/lib/instant";
+import { id } from "@instantdb/react";
+import { X } from "lucide-react";
 
 interface OrderFormProps {
   isOpen: boolean;
@@ -12,10 +12,14 @@ interface OrderFormProps {
   onSuccess: () => void;
 }
 
-export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess }) => {
+export const OrderForm: React.FC<OrderFormProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+}) => {
   const { items, totalPrice, clearCart } = useCart();
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -28,21 +32,20 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
     try {
       // Submit order to InstantDB
       await db.transact([
-        db.tx.orders[id()]
-          .update({
-            customerName,
-            customerPhone,
-            items: items.map(item => ({
-              id: item.id,
-              name: item.name,
-              price: item.price,
-              quantity: item.quantity,
-              category: item.category,
-            })),
-            totalPrice,
-            status: 'pending',
-            createdAt: Date.now(),
-          })
+        db.tx.orders[id()].update({
+          customerName,
+          customerPhone,
+          items: items.map((item) => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            category: item.category,
+          })),
+          totalPrice,
+          status: "pending",
+          createdAt: Date.now(),
+        }),
       ]);
 
       // Clear cart and show success
@@ -50,8 +53,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
       setShowSuccess(true);
 
       // Reset form
-      setCustomerName('');
-      setCustomerPhone('');
+      setCustomerName("");
+      setCustomerPhone("");
 
       // Close after 2 seconds
       setTimeout(() => {
@@ -59,8 +62,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
         onSuccess();
       }, 2000);
     } catch (error) {
-      console.error('Failed to submit order:', error);
-      alert('Failed to submit order. Please try again.');
+      console.error("Failed to submit order:", error);
+      alert("Failed to submit order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -72,35 +75,44 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
         onClick={onClose}
       >
         {/* Modal */}
         <div
-          className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative"
+          className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
             aria-label="Close"
           >
             <X size={24} />
           </button>
 
           {showSuccess ? (
-            <div className="text-center py-8">
-              <div className="text-green-500 text-6xl mb-4">✓</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Placed!</h2>
-              <p className="text-gray-600">Your order has been successfully submitted.</p>
+            <div className="py-8 text-center">
+              <div className="mb-4 text-6xl text-green-500">✓</div>
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                Order Placed!
+              </h2>
+              <p className="text-gray-600">
+                Your order has been successfully submitted.
+              </p>
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Complete Your Order</h2>
+              <h2 className="mb-4 text-2xl font-bold text-gray-800">
+                Complete Your Order
+              </h2>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="customerName"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Your Name
                   </label>
                   <input
@@ -109,13 +121,16 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter your name"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="customerPhone" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="customerPhone"
+                    className="mb-1 block text-sm font-medium text-gray-700"
+                  >
                     Phone Number
                   </label>
                   <input
@@ -124,13 +139,13 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
                     value={customerPhone}
                     onChange={(e) => setCustomerPhone(e.target.value)}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter your phone number"
                   />
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-4 mt-4">
-                  <div className="flex justify-between items-center">
+                <div className="mt-4 rounded-lg bg-gray-50 p-4">
+                  <div className="flex items-center justify-between">
                     <span className="font-semibold text-gray-700">Total:</span>
                     <span className="text-xl font-bold text-primary-700">
                       €{totalPrice.toFixed(2)}
@@ -141,9 +156,9 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-md font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Submitting...' : 'Confirm Order'}
+                  {isSubmitting ? "Submitting..." : "Confirm Order"}
                 </button>
               </form>
             </>
@@ -153,4 +168,3 @@ export const OrderForm: React.FC<OrderFormProps> = ({ isOpen, onClose, onSuccess
     </>
   );
 };
-

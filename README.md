@@ -10,6 +10,7 @@ A full-stack Next.js application for managing orders at a Chinese takeaway resta
 ## ✨ Features
 
 ### Customer Features
+
 - 🍜 Browse menu items by category
 - 🔍 Real-time search and filter
 - 🛒 Shopping cart with quantity management
@@ -18,6 +19,7 @@ A full-stack Next.js application for managing orders at a Chinese takeaway resta
 - 📝 Easy order submission
 
 ### Admin Features
+
 - 👀 Real-time order monitoring
 - 📦 Multi-order consolidation
 - 📋 Copy order lists to clipboard
@@ -35,6 +37,7 @@ A full-stack Next.js application for managing orders at a Chinese takeaway resta
 ### Installation
 
 1. **Install dependencies:**
+
 ```bash
 npm install
 ```
@@ -43,11 +46,13 @@ npm install
    - Create an account at https://instantdb.com
    - Create a new app and copy your App ID
    - Create `.env.local` file:
+
 ```bash
 NEXT_PUBLIC_INSTANT_APP_ID=your_instant_app_id_here
 ```
 
 3. **Run the development server:**
+
 ```bash
 npm run dev
 ```
@@ -104,6 +109,7 @@ china-menu/
 ## 🎯 How It Works
 
 ### Customer Flow
+
 1. Browse menu with categories
 2. Search/filter dishes
 3. Add items to cart
@@ -111,6 +117,7 @@ china-menu/
 5. Submit order → appears in admin dashboard
 
 ### Admin Flow
+
 1. Log in to admin dashboard
 2. View real-time orders
 3. Select multiple orders
@@ -121,7 +128,9 @@ china-menu/
 ## 🔧 Customization
 
 ### Update Menu Items
+
 Edit `lib/menu-data.ts`:
+
 ```typescript
 {
   name: 'New Category',
@@ -132,7 +141,9 @@ Edit `lib/menu-data.ts`:
 ```
 
 ### Change Color Scheme
+
 Edit `tailwind.config.ts`:
+
 ```typescript
 colors: {
   primary: {
@@ -145,11 +156,13 @@ colors: {
 ## 🚢 Deployment
 
 ### Vercel (Recommended)
+
 ```bash
 vercel deploy
 ```
 
 ### Other Platforms
+
 ```bash
 npm run build
 npm start
@@ -168,6 +181,6 @@ Contributions welcome! Please feel free to submit a Pull Request.
 ## 📧 Support
 
 For issues or questions:
+
 - InstantDB: https://instantdb.com/docs
 - Next.js: https://nextjs.org/docs
-

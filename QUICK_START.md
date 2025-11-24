@@ -5,6 +5,7 @@
 ### Step 1: Install Node.js
 
 If you don't have Node.js installed:
+
 - Download from https://nodejs.org/ (LTS version recommended)
 - Verify installation: `node --version` (should show v18 or higher)
 
@@ -17,6 +18,7 @@ npm install
 ```
 
 This will install all required packages:
+
 - Next.js 15
 - React 19
 - InstantDB for real-time database
@@ -103,11 +105,11 @@ Edit `lib/menu-data.ts` to add your restaurant's actual dishes:
 {
   name: 'Appetizers',
   items: [
-    { 
-      id: 'app-1', 
-      name: 'Spring Rolls', 
-      price: 3.50, 
-      category: 'Appetizers' 
+    {
+      id: 'app-1',
+      name: 'Spring Rolls',
+      price: 3.50,
+      category: 'Appetizers'
     },
     // Add more items...
   ]
@@ -167,4 +169,3 @@ PORT=3001 npm run dev
 Your Chinese takeaway ordering system is now live. Customers can start placing orders, and you can manage them from the admin dashboard in real-time.
 
 Happy ordering! 🍜
-

@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { CartItem, MenuItem } from '@/types';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import type { CartItem, MenuItem } from "@/types";
 
 interface CartContextType {
   items: CartItem[];
@@ -21,7 +27,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error('useCart must be used within a CartProvider');
+    throw new Error("useCart must be used within a CartProvider");
   }
   return context;
 };
@@ -37,12 +43,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
+    const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
         setItems(JSON.parse(savedCart));
       } catch (error) {
-        console.error('Failed to parse cart from localStorage:', error);
+        console.error("Failed to parse cart from localStorage:", error);
       }
     }
     setIsHydrated(true);
@@ -51,7 +57,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (isHydrated) {
-      localStorage.setItem('cart', JSON.stringify(items));
+      localStorage.setItem("cart", JSON.stringify(items));
     }
   }, [items, isHydrated]);
 
@@ -68,7 +74,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const removeItem = (itemId: string) => {
-    setItems((currentItems: CartItem[]) => currentItems.filter((i: CartItem) => i.id !== itemId));
+    setItems((currentItems: CartItem[]) =>
+      currentItems.filter((i: CartItem) => i.id !== itemId)
+    );
   };
 
   const updateQuantity = (itemId: string, quantity: number) => {
@@ -77,7 +85,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       return;
     }
     setItems((currentItems: CartItem[]) =>
-      currentItems.map((i: CartItem) => (i.id === itemId ? { ...i, quantity } : i))
+      currentItems.map((i: CartItem) =>
+        i.id === itemId ? { ...i, quantity } : i
+      )
     );
   };
 
@@ -85,8 +95,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setItems([]);
   };
 
-  const totalItems = items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum: number, item: CartItem) => sum + item.price * item.quantity, 0);
+  const totalItems = items.reduce(
+    (sum: number, item: CartItem) => sum + item.quantity,
+    0
+  );
+  const totalPrice = items.reduce(
+    (sum: number, item: CartItem) => sum + item.price * item.quantity,
+    0
+  );
 
   const value: CartContextType = {
     items,
@@ -103,4 +119,3 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
-

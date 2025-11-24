@@ -1,36 +1,40 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { db } from '@/lib/instant';
-import { LogIn } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { db } from "@/lib/instant";
+import { LogIn } from "lucide-react";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const { isLoading, user, error } = db.useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginError, setLoginError] = useState('');
+  const [loginError, setLoginError] = useState("");
 
   // Redirect if already logged in
   useEffect(() => {
     if (!isLoading && user) {
-      router.push('/admin/dashboard');
+      router.push("/admin/dashboard");
     }
   }, [isLoading, user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoginError('');
+    setLoginError("");
     setIsSubmitting(true);
 
     try {
       await db.auth.signInWithPassword({ email, password });
-      router.push('/admin/dashboard');
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setLoginError(err.message || 'Failed to login. Please check your credentials.');
+      router.push("/admin/dashboard");
+    } catch (err: unknown) {
+      console.error("Login error:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to login. Please check your credentials.";
+      setLoginError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -38,38 +42,41 @@ export default function AdminLoginPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="text-gray-600">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center px-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-8">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 text-white rounded-full mb-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200 px-4">
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
+        <div className="mb-8 text-center">
+          <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-600 text-white">
             <LogIn size={32} />
           </div>
           <h1 className="text-3xl font-bold text-gray-800">Admin Login</h1>
-          <p className="text-gray-600 mt-2">Sign in to manage orders</p>
+          <p className="mt-2 text-gray-600">Sign in to manage orders</p>
         </div>
 
         {loginError && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
             {loginError}
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
             {error.message}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
@@ -78,13 +85,16 @@ export default function AdminLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="admin@example.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
@@ -93,7 +103,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
               placeholder="Enter your password"
             />
           </div>
@@ -101,15 +111,18 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-md font-semibold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isSubmitting ? "Signing in..." : "Sign In"}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>Need to create an admin account?</p>
-          <a href="/admin/setup" className="text-primary-600 hover:text-primary-700 font-medium">
+          <a
+            href="/admin/setup"
+            className="font-medium text-primary-600 hover:text-primary-700"
+          >
             Go to setup page
           </a>
         </div>
@@ -117,4 +130,3 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-

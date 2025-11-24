@@ -5,6 +5,7 @@
 ### Customer-Facing Features
 
 #### 1. Menu Display
+
 - **Grid Layout**: Responsive grid that adapts to screen size (1-4 columns)
 - **Category Organization**: Dishes organized into 8 categories:
   - Antipasti (Appetizers)
@@ -19,6 +20,7 @@
 - **Price Display**: Clear pricing in euros
 
 #### 2. Search & Filter
+
 - **Real-time Search**: Instant search results as you type
 - **Debounced Input**: Optimized to reduce lag (300ms delay)
 - **Category Filter**: Quick filter buttons for each category
@@ -27,6 +29,7 @@
 - **No Results Message**: Friendly message when no matches found
 
 #### 3. Shopping Cart
+
 - **Slide-out Panel**: Smooth animation from right side
 - **Persistent Storage**: Cart saved to localStorage
 - **Item Management**:
@@ -40,6 +43,7 @@
 - **Responsive Design**: Full-width on mobile, sidebar on desktop
 
 #### 4. Order Placement
+
 - **Modal Form**: Clean overlay form for order details
 - **Required Fields**:
   - Customer name
@@ -53,6 +57,7 @@
 ### Admin Features
 
 #### 1. Authentication System
+
 - **Secure Login**: Email/password authentication via InstantDB
 - **Protected Routes**: Admin pages require authentication
 - **Auto-redirect**: Redirects to login if not authenticated
@@ -61,6 +66,7 @@
 - **One-time Setup**: Special page for creating first admin account
 
 #### 2. Order Management Dashboard
+
 - **Real-time Updates**: Orders appear instantly using InstantDB subscriptions
 - **Three Status Categories**:
   - **Pending**: New orders awaiting processing
@@ -74,12 +80,14 @@
   - Order status
 
 #### 3. Multi-Order Selection
+
 - **Checkbox Selection**: Select multiple pending orders
 - **Visual Feedback**: Selected orders highlighted
 - **Selection Counter**: Shows number of selected orders
 - **Clear Selection**: Automatic after consolidation
 
 #### 4. Order Consolidation
+
 - **Smart Aggregation**: Automatically combines duplicate items
 - **Quantity Summing**: Adds up quantities of same dishes
 - **Price Calculation**: Calculates total for all orders
@@ -88,6 +96,7 @@
 - **Admin Tracking**: Records which admin consolidated the orders
 
 #### 5. Copy to Clipboard
+
 - **Quick Copy**: One-click copy of order list
 - **Formatted Output**: Clean list format for phone orders:
   ```
@@ -99,6 +108,7 @@
 - **Works on Selection**: Copies currently selected orders
 
 #### 6. Order Status Management
+
 - **Mark as Completed**: Move orders to completed status
 - **Status Tracking**: Visual indicators for each status
 - **Count Badges**: Shows number of orders in each category
@@ -107,12 +117,14 @@
 ### Technical Features
 
 #### 1. Real-time Synchronization
+
 - **Instant Updates**: New orders appear without page refresh
 - **Live Dashboard**: Admin sees orders as they arrive
 - **Optimistic Updates**: UI updates immediately, syncs in background
 - **Conflict Resolution**: InstantDB handles concurrent updates
 
 #### 2. Responsive Design
+
 - **Mobile-First**: Optimized for phone screens
 - **Breakpoints**:
   - Mobile: 1 column
@@ -122,6 +134,7 @@
 - **Adaptive Layout**: Cart and modals adjust to screen size
 
 #### 3. Performance Optimization
+
 - **Code Splitting**: Next.js automatically splits code
 - **Lazy Loading**: Components load as needed
 - **Debounced Search**: Reduces unnecessary re-renders
@@ -129,6 +142,7 @@
 - **LocalStorage Caching**: Cart data cached locally
 
 #### 4. User Experience
+
 - **Loading States**: Shows when data is loading
 - **Error Handling**: Graceful error messages
 - **Success Feedback**: Confirmations for actions
@@ -137,6 +151,7 @@
 - **Screen Reader Support**: ARIA labels for accessibility
 
 #### 5. Security
+
 - **Protected Admin Routes**: Requires authentication
 - **Environment Variables**: Sensitive data in .env
 - **Client-side Validation**: Form validation before submission
@@ -146,6 +161,7 @@
 ### Data Management
 
 #### 1. Menu Data Structure
+
 ```typescript
 {
   category: "Category Name",
@@ -161,6 +177,7 @@
 ```
 
 #### 2. Order Data Structure
+
 ```typescript
 {
   id: "order-id",
@@ -182,6 +199,7 @@
 ```
 
 #### 3. Consolidated Order Structure
+
 ```typescript
 {
   id: "consolidated-id",
@@ -219,6 +237,7 @@
 ## 🎯 Use Cases
 
 ### For Restaurant Staff
+
 1. Monitor incoming orders in real-time
 2. Group multiple orders for efficient calling
 3. Copy consolidated list for phone orders
@@ -226,6 +245,7 @@
 5. View order history
 
 ### For Customers
+
 1. Browse complete menu online
 2. Search for specific dishes
 3. Build order with multiple items
@@ -233,6 +253,7 @@
 5. Submit orders without calling
 
 ### For Restaurant Owners
+
 1. Reduce phone order errors
 2. Track order volume
 3. Manage multiple staff accounts
@@ -268,4 +289,3 @@
 - Single restaurant only
 
 These limitations are by design for the MVP (Minimum Viable Product) and can be added as needed.
-

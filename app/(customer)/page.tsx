@@ -1,4 +1,4 @@
-import { MenuGrid } from '@/components/MenuGrid';
+import { MenuGrid } from "@/components/MenuGrid";
 
 export default function HomePage() {
   return (
@@ -7,4 +7,3 @@ export default function HomePage() {
     </div>
   );
 }
-

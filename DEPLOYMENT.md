@@ -11,6 +11,7 @@ Vercel is the company behind Next.js and offers the best Next.js hosting experie
 ### Steps:
 
 1. **Push to GitHub**
+
 ```bash
 git init
 git add .
@@ -21,6 +22,7 @@ git push -u origin main
 ```
 
 2. **Deploy to Vercel**
+
 - Go to https://vercel.com
 - Sign up/login with GitHub
 - Click "New Project"
@@ -31,9 +33,10 @@ git push -u origin main
 - Click "Deploy"
 
 3. **Done!**
-Your site will be live at `https://your-project.vercel.app`
+   Your site will be live at `https://your-project.vercel.app`
 
 ### Custom Domain (Optional)
+
 - Go to your project settings in Vercel
 - Click "Domains"
 - Add your custom domain
@@ -44,11 +47,13 @@ Your site will be live at `https://your-project.vercel.app`
 ### Steps:
 
 1. **Build Settings**
+
 - Build command: `npm run build`
 - Publish directory: `.next`
 - Add environment variable: `NEXT_PUBLIC_INSTANT_APP_ID`
 
 2. **Deploy**
+
 ```bash
 # Install Netlify CLI
 npm install -g netlify-cli
@@ -65,6 +70,7 @@ netlify deploy --prod
 For AWS, DigitalOcean, Linode, etc.
 
 ### Prerequisites:
+
 - Node.js 18+ installed
 - nginx or similar web server
 - PM2 for process management
@@ -72,11 +78,13 @@ For AWS, DigitalOcean, Linode, etc.
 ### Steps:
 
 1. **Install PM2**
+
 ```bash
 npm install -g pm2
 ```
 
 2. **Clone Repository**
+
 ```bash
 git clone your-repo-url
 cd china-menu
@@ -84,16 +92,19 @@ npm install
 ```
 
 3. **Create .env.local**
+
 ```bash
 echo "NEXT_PUBLIC_INSTANT_APP_ID=your_app_id" > .env.local
 ```
 
 4. **Build**
+
 ```bash
 npm run build
 ```
 
 5. **Start with PM2**
+
 ```bash
 pm2 start npm --name "china-menu" -- start
 pm2 save
@@ -101,6 +112,7 @@ pm2 startup
 ```
 
 6. **Configure nginx**
+
 ```nginx
 server {
     listen 80;
@@ -118,6 +130,7 @@ server {
 ```
 
 7. **Enable HTTPS** (recommended)
+
 ```bash
 sudo apt install certbot python3-certbot-nginx
 sudo certbot --nginx -d your-domain.com
@@ -126,6 +139,7 @@ sudo certbot --nginx -d your-domain.com
 ## Option 4: Docker
 
 ### Dockerfile
+
 ```dockerfile
 FROM node:18-alpine AS base
 
@@ -159,8 +173,9 @@ CMD ["node", "server.js"]
 ```
 
 ### docker-compose.yml
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   web:
     build: .
@@ -172,6 +187,7 @@ services:
 ```
 
 ### Deploy
+
 ```bash
 docker-compose up -d
 ```
@@ -220,17 +236,21 @@ NEXT_PUBLIC_INSTANT_APP_ID=your_instant_app_id
 ## Performance Optimization (Optional)
 
 ### Enable Image Optimization
+
 If you add images later, configure `next.config.js`:
+
 ```javascript
 module.exports = {
   images: {
-    domains: ['your-image-cdn.com'],
+    domains: ["your-image-cdn.com"],
   },
-}
+};
 ```
 
 ### Add Analytics
+
 Add to `app/layout.tsx`:
+
 ```typescript
 import { Analytics } from '@vercel/analytics/react';
 
@@ -249,10 +269,12 @@ export default function RootLayout({ children }) {
 ## Monitoring
 
 ### Vercel
+
 - Built-in analytics and error tracking
 - View deployment logs in dashboard
 
 ### Self-Hosted
+
 ```bash
 # View PM2 logs
 pm2 logs china-menu
@@ -264,16 +286,19 @@ pm2 monit
 ## Troubleshooting
 
 ### Build Fails
+
 - Check Node.js version (must be 18+)
 - Verify all dependencies installed
 - Check for TypeScript errors: `npm run build`
 
 ### Environment Variables Not Working
+
 - Make sure they start with `NEXT_PUBLIC_`
 - Rebuild after changing env vars
 - Check deployment platform's env var section
 
 ### Real-time Updates Not Working
+
 - Verify InstantDB App ID is correct
 - Check browser console for errors
 - Ensure WebSocket connections aren't blocked by firewall
@@ -300,11 +325,13 @@ Your data is stored in InstantDB, which handles backups automatically. However, 
 ## Cost Estimates
 
 ### Free Tier (Suitable for Small Restaurant)
+
 - **Vercel**: Free for personal/small projects
 - **InstantDB**: Free up to 10k operations/month
 - **Custom Domain**: ~$10-15/year
 
 ### Paid Tier (High Volume)
+
 - **Vercel Pro**: $20/month
 - **InstantDB Pro**: Starting at $25/month
 - **Total**: ~$45/month + domain
@@ -322,6 +349,7 @@ Your data is stored in InstantDB, which handles backups automatically. However, 
 ## Support
 
 For deployment issues:
+
 - **Vercel**: https://vercel.com/support
 - **Netlify**: https://docs.netlify.com
 - **InstantDB**: https://instantdb.com/discord
@@ -334,4 +362,3 @@ For deployment issues:
 Choose your preferred deployment method and follow the steps above. Your Chinese takeaway ordering system will be live in minutes!
 
 **Recommended**: Start with Vercel for the easiest deployment experience.
-
