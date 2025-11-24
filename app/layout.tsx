@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Chinese Takeaway - Order Online",
-  description: "Order delicious Chinese food online",
+  title: "Ristorante Cinese - Ordina Online",
+  description: "Ordina deliziosi piatti cinesi online",
 };
 
 export default function RootLayout({
@@ -16,9 +17,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="it" suppressHydrationWarning>
       <body className={inter.className}>
         <CartProvider>{children}</CartProvider>
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );

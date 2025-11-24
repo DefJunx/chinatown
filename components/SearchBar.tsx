@@ -39,7 +39,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search dishes..."
+          placeholder="Cerca piatti..."
           className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
         />
       </div>
@@ -54,7 +54,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
-          All
+          Tutti
         </button>
         {categories.map((category) => (
           <button

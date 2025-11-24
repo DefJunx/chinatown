@@ -3,8 +3,10 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { db, id } from "@/lib/instant";
 import type { Order } from "@/types";
-import { Check, Copy, LogOut, MessageCircle, Package } from "lucide-react";
+import { Copy, LogOut, MessageCircle, Package, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 export const AdminOrderList: React.FC = () => {
   const router = useRouter();
@@ -17,20 +19,36 @@ export const AdminOrderList: React.FC = () => {
   const [copiedText, setCopiedText] = useState("");
   const [isMounted, setIsMounted] = useState(false);
   const [copiedConsolidatedId, setCopiedConsolidatedId] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Group orders by status
+  // Helper function to check if a date is today
+  const isToday = (timestamp: number) => {
+    const today = new Date();
+    const date = new Date(timestamp);
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    );
+  };
+
+  // Group orders by status and filter for today only
   const ordersByStatus = useMemo(() => {
     const orders = (data?.orders || []) as Order[];
     const consolidatedOrders = (data?.consolidatedOrders || []) as any[];
+
+    // Filter only today's orders
+    const todayOrders = orders.filter((o) => isToday(o.createdAt));
+    const todayConsolidated = consolidatedOrders.filter((o) => isToday(o.createdAt));
+
     return {
-      pending: orders.filter((o) => o.status === "pending"),
-      individualConsolidated: orders.filter((o) => o.status === "consolidated"),
-      consolidated: consolidatedOrders,
-      completed: orders.filter((o) => o.status === "completed"),
+      pending: todayOrders.filter((o) => o.status === "pending"),
+      individualConsolidated: todayOrders.filter((o) => o.status === "consolidated"),
+      consolidated: todayConsolidated,
     };
   }, [data?.orders, data?.consolidatedOrders]);
 
@@ -49,8 +67,7 @@ export const AdminOrderList: React.FC = () => {
 
     const allOrders = [
       ...ordersByStatus.pending,
-      ...ordersByStatus.consolidated,
-      ...ordersByStatus.completed,
+      ...ordersByStatus.individualConsolidated,
     ];
     const ordersToConsolidate = allOrders.filter((o) =>
       selectedOrders.has(o.id)
@@ -96,45 +113,17 @@ export const AdminOrderList: React.FC = () => {
       ]);
 
       setSelectedOrders(new Set());
-      alert("Orders consolidated successfully!");
+      toast.success("Ordini consolidati con successo!");
     } catch (err) {
       console.error("Failed to consolidate orders:", err);
-      alert("Failed to consolidate orders. Please try again.");
-    }
-  };
-
-  const handleMarkAsCompleted = async (orderId: string) => {
-    try {
-      await db.transact([
-        db.tx.orders[orderId].update({ status: "completed" }),
-      ]);
-    } catch (err) {
-      console.error("Failed to update order status:", err);
-      alert("Failed to update order status.");
-    }
-  };
-
-  const handleMarkConsolidatedComplete = async (consolidatedId: string, orderIds: string[]) => {
-    try {
-      await db.transact([
-        // Mark all original orders as completed
-        ...orderIds.map((orderId) =>
-          db.tx.orders[orderId].update({ status: "completed" })
-        ),
-        // Update consolidated order status
-        db.tx.consolidatedOrders[consolidatedId].update({ status: "completed" })
-      ]);
-    } catch (err) {
-      console.error("Failed to complete consolidated order:", err);
-      alert("Failed to complete consolidated order.");
+      toast.error("Impossibile consolidare gli ordini. Riprova.");
     }
   };
 
   const handleCopyConsolidated = () => {
     const allOrders = [
       ...ordersByStatus.pending,
-      ...ordersByStatus.consolidated,
-      ...ordersByStatus.completed,
+      ...ordersByStatus.individualConsolidated,
     ];
     const ordersToConsolidate = allOrders.filter((o) =>
       selectedOrders.has(o.id)
@@ -194,10 +183,41 @@ export const AdminOrderList: React.FC = () => {
       .map((item) => `${item.quantity}x ${item.name}`)
       .join("\n");
 
-    const message = `*Consolidated Order*\n${consolidatedOrder.orderIds.length} orders\nTotal: €${consolidatedOrder.totalPrice.toFixed(2)}\n\n*Items:*\n${orderText}`;
+    const message = `*Ordine Consolidato*\n${consolidatedOrder.orderIds.length} ordini\nTotale: €${consolidatedOrder.totalPrice.toFixed(2)}\n\n*Piatti:*\n${orderText}`;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
+  };
+
+  const handleClearAllOrders = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const confirmClearAllOrders = async () => {
+    try {
+      const allOrders = (data?.orders || []) as Order[];
+      const allConsolidatedOrders = (data?.consolidatedOrders || []) as any[];
+
+      // Create delete transactions for all orders and consolidated orders
+      const deleteTransactions = [
+        ...allOrders.map((order) => db.tx.orders[order.id].delete()),
+        ...allConsolidatedOrders.map((consolidatedOrder) =>
+          db.tx.consolidatedOrders[consolidatedOrder.id].delete()
+        ),
+      ];
+
+      if (deleteTransactions.length === 0) {
+        toast.info("Nessun ordine da eliminare.");
+        return;
+      }
+
+      await db.transact(deleteTransactions);
+      setSelectedOrders(new Set());
+      toast.success(`Eliminati con successo ${allOrders.length} ordini e ${allConsolidatedOrders.length} ordini consolidati.`);
+    } catch (err) {
+      console.error("Failed to clear orders:", err);
+      toast.error("Impossibile eliminare gli ordini. Riprova.");
+    }
   };
 
   const handleLogout = async () => {
@@ -206,13 +226,13 @@ export const AdminOrderList: React.FC = () => {
   };
 
   if (!isMounted || isLoading) {
-    return <div className="py-8 text-center">Loading orders...</div>;
+    return <div className="py-8 text-center">Caricamento ordini...</div>;
   }
 
   if (error) {
     return (
       <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-        Error loading orders: {error.message}
+        Errore durante il caricamento degli ordini: {error.message}
       </div>
     );
   }
@@ -221,14 +241,23 @@ export const AdminOrderList: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-800">Order Management</h2>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300"
-        >
-          <LogOut size={18} />
-          Logout
-        </button>
+        <h2 className="text-2xl font-bold text-gray-800">Gestione Ordini</h2>
+        <div className="flex gap-2">
+          <button
+            onClick={handleClearAllOrders}
+            className="flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
+          >
+            <Trash2 size={18} />
+            Elimina Tutti gli Ordini
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300"
+          >
+            <LogOut size={18} />
+            Esci
+          </button>
+        </div>
       </div>
 
       {/* Consolidate Actions */}
@@ -236,7 +265,7 @@ export const AdminOrderList: React.FC = () => {
         <div className="rounded-lg border border-primary-200 bg-primary-50 p-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="font-medium text-primary-800">
-              {selectedOrders.size} order(s) selected
+              {selectedOrders.size} ordine/i selezionato/i
             </p>
             <div className="flex gap-2">
               <button
@@ -244,14 +273,14 @@ export const AdminOrderList: React.FC = () => {
                 className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 transition-colors hover:bg-gray-100"
               >
                 <Copy size={18} />
-                Copy List
+                Copia Lista
               </button>
               <button
                 onClick={handleConsolidateOrders}
                 className="flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-white transition-colors hover:bg-primary-700"
               >
                 <Package size={18} />
-                Consolidate
+                Consolida
               </button>
             </div>
           </div>
@@ -262,7 +291,7 @@ export const AdminOrderList: React.FC = () => {
       {copiedText && (
         <div className="rounded-lg border border-green-200 bg-green-50 p-4">
           <p className="mb-2 font-medium text-green-800">
-            Copied to clipboard:
+            Copiato negli appunti:
           </p>
           <pre className="whitespace-pre-wrap text-sm text-green-700">
             {copiedText}
@@ -276,11 +305,11 @@ export const AdminOrderList: React.FC = () => {
           <span className="rounded bg-yellow-500 px-2 py-1 text-sm text-white">
             {ordersByStatus.pending.length}
           </span>
-          Pending Orders
+          Ordini di Oggi
         </h3>
         {ordersByStatus.pending.length === 0 ? (
           <p className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
-            No pending orders
+            Nessun ordine oggi
           </p>
         ) : (
           <div className="space-y-4">
@@ -290,7 +319,6 @@ export const AdminOrderList: React.FC = () => {
                 order={order}
                 isSelected={selectedOrders.has(order.id)}
                 onSelect={handleSelectOrder}
-                onMarkCompleted={handleMarkAsCompleted}
                 showSelect={true}
               />
             ))}
@@ -304,11 +332,11 @@ export const AdminOrderList: React.FC = () => {
           <span className="rounded bg-blue-500 px-2 py-1 text-sm text-white">
             {ordersByStatus.consolidated.length}
           </span>
-          Consolidated Orders
+          Ordini Consolidati (Oggi)
         </h3>
         {ordersByStatus.consolidated.length === 0 ? (
           <p className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
-            No consolidated orders
+            Nessun ordine consolidato oggi
           </p>
         ) : (
           <div className="space-y-4">
@@ -316,7 +344,6 @@ export const AdminOrderList: React.FC = () => {
               <ConsolidatedOrderCard
                 key={consolidatedOrder.id}
                 consolidatedOrder={consolidatedOrder}
-                onMarkCompleted={handleMarkConsolidatedComplete}
                 onCopy={handleCopyConsolidatedOrder}
                 onWhatsApp={handleWhatsAppConsolidatedOrder}
                 isCopied={copiedConsolidatedId === consolidatedOrder.id}
@@ -326,33 +353,17 @@ export const AdminOrderList: React.FC = () => {
         )}
       </div>
 
-      {/* Completed Orders */}
-      <div>
-        <h3 className="mb-4 flex items-center gap-2 text-xl font-bold text-gray-700">
-          <span className="rounded bg-green-500 px-2 py-1 text-sm text-white">
-            {ordersByStatus.completed.length}
-          </span>
-          Completed Orders
-        </h3>
-        {ordersByStatus.completed.length === 0 ? (
-          <p className="rounded-lg bg-gray-50 py-8 text-center text-gray-500">
-            No completed orders
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {ordersByStatus.completed.slice(0, 10).map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                isSelected={false}
-                onSelect={handleSelectOrder}
-                onMarkCompleted={handleMarkAsCompleted}
-                showSelect={false}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        onClose={() => setShowConfirmDialog(false)}
+        onConfirm={confirmClearAllOrders}
+        title="Eliminare Tutti gli Ordini?"
+        message="Sei sicuro di voler eliminare TUTTI gli ordini e gli ordini consolidati? Questa azione non può essere annullata!"
+        confirmText="Elimina Tutti"
+        cancelText="Annulla"
+        variant="danger"
+      />
     </div>
   );
 };
@@ -361,7 +372,6 @@ interface OrderCardProps {
   order: Order;
   isSelected: boolean;
   onSelect: (orderId: string) => void;
-  onMarkCompleted: (orderId: string) => void;
   showSelect: boolean;
 }
 
@@ -369,7 +379,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
   order,
   isSelected,
   onSelect,
-  onMarkCompleted,
   showSelect,
 }) => {
   return (
@@ -411,8 +420,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
           </span>
         </div>
 
-        <div className="mb-3 rounded bg-gray-50 p-3">
-          <h5 className="mb-2 font-semibold text-gray-700">Items:</h5>
+        <div className="rounded bg-gray-50 p-3">
+          <h5 className="mb-2 font-semibold text-gray-700">Piatti:</h5>
           <ul className="space-y-1">
             {order.items.map((item) => (
               <li key={item.id} className="flex justify-between text-gray-700">
@@ -426,16 +435,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
             ))}
           </ul>
         </div>
-
-        {order.status === "pending" && (
-          <button
-            onClick={() => onMarkCompleted(order.id)}
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 py-2 text-white transition-colors hover:bg-green-700"
-          >
-            <Check size={18} />
-            Mark as Completed
-          </button>
-        )}
       </div>
     </div>
   );
@@ -443,7 +442,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
 interface ConsolidatedOrderCardProps {
   consolidatedOrder: any;
-  onMarkCompleted: (consolidatedId: string, orderIds: string[]) => void;
   onCopy: (consolidatedOrder: any) => void;
   onWhatsApp: (consolidatedOrder: any) => void;
   isCopied: boolean;
@@ -451,7 +449,6 @@ interface ConsolidatedOrderCardProps {
 
 const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
   consolidatedOrder,
-  onMarkCompleted,
   onCopy,
   onWhatsApp,
   isCopied,
@@ -469,7 +466,7 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
         <div className="mb-3 flex items-start justify-between">
           <div className="flex-1">
             <h4 className="text-lg font-bold text-gray-800">
-              Consolidated Order ({consolidatedOrder.orderIds.length} orders)
+              Ordine Consolidato ({consolidatedOrder.orderIds.length} ordini)
             </h4>
             <p className="text-sm text-gray-500">
               {new Date(consolidatedOrder.createdAt).toLocaleString('en-GB', {
@@ -488,7 +485,7 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
         </div>
 
         <div className="mb-3 rounded bg-white p-3">
-          <h5 className="mb-2 font-semibold text-gray-700">Aggregated Items:</h5>
+          <h5 className="mb-2 font-semibold text-gray-700">Piatti Aggregati:</h5>
           <ul className="space-y-1">
             {itemsArray.map((item) => (
               <li key={item.id} className="flex justify-between text-gray-700">
@@ -513,7 +510,7 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
             }`}
           >
             <Copy size={18} />
-            {isCopied ? "Copied!" : "Copy"}
+            {isCopied ? "Copiato!" : "Copia"}
           </button>
           <button
             onClick={() => onWhatsApp(consolidatedOrder)}
@@ -523,15 +520,6 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
             WhatsApp
           </button>
         </div>
-        {consolidatedOrder.status === "pending" && (
-          <button
-            onClick={() => onMarkCompleted(consolidatedOrder.id, consolidatedOrder.orderIds)}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 py-2 text-white transition-colors hover:bg-blue-700"
-          >
-            <Check size={18} />
-            Mark as Completed
-          </button>
-        )}
       </div>
     </div>
   );

@@ -36,12 +36,12 @@ export const MiniCart: React.FC = () => {
         <div className="flex items-center justify-between bg-primary-700 p-4 text-white">
           <div className="flex items-center gap-2">
             <ShoppingBag size={24} />
-            <h2 className="text-xl font-bold">Your Cart</h2>
+            <h2 className="text-xl font-bold">Il Tuo Carrello</h2>
           </div>
           <button
             onClick={() => setIsCartOpen(false)}
             className="rounded-md p-1 transition-colors hover:bg-primary-800"
-            aria-label="Close cart"
+            aria-label="Chiudi carrello"
           >
             <X size={24} />
           </button>
@@ -52,7 +52,7 @@ export const MiniCart: React.FC = () => {
           {items.length === 0 ? (
             <div className="mt-8 text-center text-gray-500">
               <ShoppingBag size={48} className="mx-auto mb-4 text-gray-300" />
-              <p>Your cart is empty</p>
+              <p>Il tuo carrello è vuoto</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -80,7 +80,7 @@ export const MiniCart: React.FC = () => {
                           updateQuantity(item.id, item.quantity - 1)
                         }
                         className="rounded-md bg-gray-200 p-1 transition-colors hover:bg-gray-300"
-                        aria-label="Decrease quantity"
+                        aria-label="Diminuisci quantità"
                       >
                         <Minus size={16} />
                       </button>
@@ -92,7 +92,7 @@ export const MiniCart: React.FC = () => {
                           updateQuantity(item.id, item.quantity + 1)
                         }
                         className="rounded-md bg-gray-200 p-1 transition-colors hover:bg-gray-300"
-                        aria-label="Increase quantity"
+                        aria-label="Aumenta quantità"
                       >
                         <Plus size={16} />
                       </button>
@@ -111,7 +111,7 @@ export const MiniCart: React.FC = () => {
         {items.length > 0 && (
           <div className="border-t border-gray-200 bg-gray-50 p-4">
             <div className="mb-4 flex items-center justify-between">
-              <span className="text-lg font-semibold">Total:</span>
+              <span className="text-lg font-semibold">Totale:</span>
               <span className="text-2xl font-bold text-primary-700">
                 €{totalPrice.toFixed(2)}
               </span>
@@ -120,7 +120,7 @@ export const MiniCart: React.FC = () => {
               onClick={handlePlaceOrder}
               className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700"
             >
-              Place Order
+              Effettua Ordine
             </button>
           </div>
         )}

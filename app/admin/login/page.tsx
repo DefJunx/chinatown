@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "Failed to send verification code. Please try again.";
+          : "Impossibile inviare il codice di verifica. Riprova.";
       setLoginError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -60,7 +60,7 @@ export default function AdminLoginPage() {
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "Invalid code. Please check and try again.";
+          : "Codice non valido. Controlla e riprova.";
       setLoginError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -71,7 +71,7 @@ export default function AdminLoginPage() {
   if (!isMounted || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
-        <div className="text-gray-600">Loading...</div>
+        <div className="text-gray-600">Caricamento...</div>
       </div>
     );
   }
@@ -83,8 +83,8 @@ export default function AdminLoginPage() {
           <div className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary-600 text-white">
             <LogIn size={32} />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Admin Login</h1>
-          <p className="mt-2 text-gray-600">Sign in to manage orders</p>
+          <h1 className="text-3xl font-bold text-gray-800">Accesso Amministratore</h1>
+          <p className="mt-2 text-gray-600">Accedi per gestire gli ordini</p>
         </div>
 
         {loginError && (
@@ -124,13 +124,13 @@ export default function AdminLoginPage() {
               disabled={isSubmitting}
               className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? "Sending code..." : "Send Verification Code"}
+              {isSubmitting ? "Invio codice..." : "Invia Codice di Verifica"}
             </button>
           </form>
         ) : (
           <form onSubmit={handleVerifyCode} className="space-y-4">
             <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-green-700">
-              Check your email for a verification code.
+              Controlla la tua email per il codice di verifica.
             </div>
 
             <div>
@@ -154,7 +154,7 @@ export default function AdminLoginPage() {
                 htmlFor="code"
                 className="mb-1 block text-sm font-medium text-gray-700"
               >
-                Verification Code
+                Codice di Verifica
               </label>
               <input
                 type="text"
@@ -163,7 +163,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setCode(e.target.value)}
                 required
                 className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="Enter 6-digit code"
+                placeholder="Inserisci codice a 6 cifre"
                 maxLength={6}
               />
             </div>
@@ -173,7 +173,7 @@ export default function AdminLoginPage() {
               disabled={isSubmitting}
               className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {isSubmitting ? "Verifying..." : "Verify Code"}
+              {isSubmitting ? "Verifica in corso..." : "Verifica Codice"}
             </button>
 
             <button
@@ -185,13 +185,13 @@ export default function AdminLoginPage() {
               }}
               className="w-full text-sm text-primary-600 hover:text-primary-700"
             >
-              ← Back to email entry
+              ← Torna all&apos;inserimento email
             </button>
           </form>
         )}
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>First time? Enter your email above to create an account.</p>
+          <p>Prima volta? Inserisci la tua email sopra per creare un account.</p>
         </div>
       </div>
     </div>

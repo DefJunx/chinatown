@@ -49,7 +49,7 @@ export const MenuGrid: React.FC = () => {
       {filteredMenuData.length === 0 ? (
         <div className="py-12 text-center">
           <p className="text-lg text-gray-500">
-            No dishes found matching your criteria.
+            Nessun piatto trovato con i criteri specificati.
           </p>
         </div>
       ) : (
