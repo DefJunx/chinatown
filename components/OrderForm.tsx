@@ -2,8 +2,7 @@
 
 import React, { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
-import { db } from "@/lib/instant";
-import { id } from "@instantdb/react";
+import { db, id } from "@/lib/instant";
 import { X } from "lucide-react";
 
 interface OrderFormProps {
@@ -93,7 +92,11 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 
           {showSuccess ? (
             <div className="py-8 text-center">
-              <div className="mb-4 text-6xl text-green-500">✓</div>
+              <div className="mb-4 flex items-center justify-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-500 text-5xl font-bold text-white">
+                  ✓
+                </div>
+              </div>
               <h2 className="mb-2 text-2xl font-bold text-gray-800">
                 Order Placed!
               </h2>

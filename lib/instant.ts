@@ -1,4 +1,4 @@
-import { init } from "@instantdb/react";
+import { init, id } from "@instantdb/react";
 import type { Order, ConsolidatedOrder } from "@/types";
 
 // Define the schema for InstantDB
@@ -20,6 +20,9 @@ if (!APP_ID) {
 export const db = init({
   appId: APP_ID,
 });
+
+// Export the id function for generating unique IDs
+export { id };
 
 // Export useful types
 export type Schema = typeof schema;

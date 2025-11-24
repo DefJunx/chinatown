@@ -9,9 +9,16 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const { isLoading, user, error } = db.useAuth();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Fix hydration error by only rendering after mount
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -20,27 +27,48 @@ export default function AdminLoginPage() {
     }
   }, [isLoading, user, router]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError("");
     setIsSubmitting(true);
 
     try {
-      await db.auth.signInWithPassword({ email, password });
-      router.push("/admin/dashboard");
+      await db.auth.sendMagicCode({ email });
+      setCodeSent(true);
     } catch (err: unknown) {
-      console.error("Login error:", err);
+      console.error("Send code error:", err);
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "Failed to login. Please check your credentials.";
+          : "Failed to send verification code. Please try again.";
       setLoginError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (isLoading) {
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    setIsSubmitting(true);
+
+    try {
+      await db.auth.signInWithMagicCode({ email, code });
+      router.push("/admin/dashboard");
+    } catch (err: unknown) {
+      console.error("Verify code error:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Invalid code. Please check and try again.";
+      setLoginError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Show loading during SSR and initial client render
+  if (!isMounted || isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="text-gray-600">Loading...</div>
@@ -71,60 +99,99 @@ export default function AdminLoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="email"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="admin@example.com"
-            />
-          </div>
+        {!codeSent ? (
+          <form onSubmit={handleSendCode} className="space-y-4">
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="admin@example.com"
+              />
+            </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="mb-1 block text-sm font-medium text-gray-700"
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Enter your password"
-            />
-          </div>
+              {isSubmitting ? "Sending code..." : "Send Verification Code"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+              Check your email for a verification code.
+            </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isSubmitting ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                disabled
+                className="w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-gray-600"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="code"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Verification Code
+              </label>
+              <input
+                type="text"
+                id="code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Enter 6-digit code"
+                maxLength={6}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isSubmitting ? "Verifying..." : "Verify Code"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setCodeSent(false);
+                setCode("");
+                setLoginError("");
+              }}
+              className="w-full text-sm text-primary-600 hover:text-primary-700"
+            >
+              ← Back to email entry
+            </button>
+          </form>
+        )}
 
         <div className="mt-6 text-center text-sm text-gray-600">
-          <p>Need to create an admin account?</p>
-          <a
-            href="/admin/setup"
-            className="font-medium text-primary-600 hover:text-primary-700"
-          >
-            Go to setup page
-          </a>
+          <p>First time? Enter your email above to create an account.</p>
         </div>
       </div>
     </div>

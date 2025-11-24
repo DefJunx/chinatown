@@ -8,40 +8,49 @@ import { UserPlus } from "lucide-react";
 export default function AdminSetupPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [code, setCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      await db.auth.signUp({ email, password });
+      await db.auth.sendMagicCode({ email });
+      setCodeSent(true);
+    } catch (err: unknown) {
+      console.error("Send code error:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Failed to send verification code. Please try again.";
+      setError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      await db.auth.signInWithMagicCode({ email, code });
       setSuccess(true);
       setTimeout(() => {
         router.push("/admin/dashboard");
       }, 2000);
     } catch (err: unknown) {
-      console.error("Signup error:", err);
+      console.error("Verify code error:", err);
       const errorMessage =
         err instanceof Error
           ? err.message
-          : "Failed to create account. Please try again.";
+          : "Invalid code. Please check and try again.";
       setError(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -52,7 +61,11 @@ export default function AdminSetupPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-100 to-primary-200 px-4">
         <div className="w-full max-w-md rounded-lg bg-white p-8 text-center shadow-xl">
-          <div className="mb-4 text-6xl text-green-500">✓</div>
+          <div className="mb-4 flex items-center justify-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-500 text-5xl font-bold text-white">
+              ✓
+            </div>
+          </div>
           <h2 className="mb-2 text-2xl font-bold text-gray-800">
             Account Created!
           </h2>
@@ -86,70 +99,96 @@ export default function AdminSetupPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="email"
-              className="mb-1 block text-sm font-medium text-gray-700"
-            >
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="admin@example.com"
-            />
-          </div>
+        {!codeSent ? (
+          <form onSubmit={handleSendCode} className="space-y-4">
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="admin@example.com"
+              />
+            </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="mb-1 block text-sm font-medium text-gray-700"
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="At least 8 characters"
-            />
-          </div>
+              {isSubmitting ? "Sending code..." : "Send Verification Code"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <div className="mb-4 rounded-md border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+              Check your email for a verification code.
+            </div>
 
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="mb-1 block text-sm font-medium text-gray-700"
+            <div>
+              <label
+                htmlFor="email"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                disabled
+                className="w-full rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-gray-600"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="code"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Verification Code
+              </label>
+              <input
+                type="text"
+                id="code"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                required
+                className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Enter 6-digit code"
+                maxLength={6}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Re-enter password"
-            />
-          </div>
+              {isSubmitting ? "Verifying..." : "Verify & Create Account"}
+            </button>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isSubmitting ? "Creating Account..." : "Create Account"}
-          </button>
-        </form>
+            <button
+              type="button"
+              onClick={() => {
+                setCodeSent(false);
+                setCode("");
+                setError("");
+              }}
+              className="w-full text-sm text-primary-600 hover:text-primary-700"
+            >
+              ← Back to email entry
+            </button>
+          </form>
+        )}
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>Already have an account?</p>

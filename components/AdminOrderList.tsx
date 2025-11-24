@@ -1,27 +1,38 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { db } from "@/lib/instant";
+import React, { useState, useMemo, useEffect } from "react";
+import { db, id } from "@/lib/instant";
 import type { Order } from "@/types";
-import { Check, Copy, LogOut, Package } from "lucide-react";
+import { Check, Copy, LogOut, MessageCircle, Package } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export const AdminOrderList: React.FC = () => {
   const router = useRouter();
   const { user } = db.useAuth();
-  const { isLoading, error, data } = db.useQuery({ orders: {} });
+  const { isLoading, error, data } = db.useQuery({
+    orders: {},
+    consolidatedOrders: {}
+  });
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [copiedText, setCopiedText] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
+  const [copiedConsolidatedId, setCopiedConsolidatedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Group orders by status
   const ordersByStatus = useMemo(() => {
     const orders = (data?.orders || []) as Order[];
+    const consolidatedOrders = (data?.consolidatedOrders || []) as any[];
     return {
       pending: orders.filter((o) => o.status === "pending"),
-      consolidated: orders.filter((o) => o.status === "consolidated"),
+      individualConsolidated: orders.filter((o) => o.status === "consolidated"),
+      consolidated: consolidatedOrders,
       completed: orders.filter((o) => o.status === "completed"),
     };
-  }, [data?.orders]);
+  }, [data?.orders, data?.consolidatedOrders]);
 
   const handleSelectOrder = (orderId: string) => {
     const newSelected = new Set(selectedOrders);
@@ -68,7 +79,7 @@ export const AdminOrderList: React.FC = () => {
 
     try {
       // Create consolidated order
-      const consolidatedId = db.id();
+      const consolidatedId = id();
       await db.transact([
         db.tx.consolidatedOrders[consolidatedId].update({
           orderIds: Array.from(selectedOrders),
@@ -100,6 +111,22 @@ export const AdminOrderList: React.FC = () => {
     } catch (err) {
       console.error("Failed to update order status:", err);
       alert("Failed to update order status.");
+    }
+  };
+
+  const handleMarkConsolidatedComplete = async (consolidatedId: string, orderIds: string[]) => {
+    try {
+      await db.transact([
+        // Mark all original orders as completed
+        ...orderIds.map((orderId) =>
+          db.tx.orders[orderId].update({ status: "completed" })
+        ),
+        // Update consolidated order status
+        db.tx.consolidatedOrders[consolidatedId].update({ status: "completed" })
+      ]);
+    } catch (err) {
+      console.error("Failed to complete consolidated order:", err);
+      alert("Failed to complete consolidated order.");
     }
   };
 
@@ -138,12 +165,47 @@ export const AdminOrderList: React.FC = () => {
     setTimeout(() => setCopiedText(""), 3000);
   };
 
+  const handleCopyConsolidatedOrder = (consolidatedOrder: any) => {
+    const itemsArray = Object.entries(consolidatedOrder.items).map(([id, item]: [string, any]) => ({
+      id,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    const text = itemsArray
+      .map((item) => `${item.quantity}x ${item.name}`)
+      .join("\n");
+
+    navigator.clipboard.writeText(text);
+    setCopiedConsolidatedId(consolidatedOrder.id);
+    setTimeout(() => setCopiedConsolidatedId(null), 3000);
+  };
+
+  const handleWhatsAppConsolidatedOrder = (consolidatedOrder: any) => {
+    const itemsArray = Object.entries(consolidatedOrder.items).map(([id, item]: [string, any]) => ({
+      id,
+      name: item.name,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    const orderText = itemsArray
+      .map((item) => `${item.quantity}x ${item.name}`)
+      .join("\n");
+
+    const message = `*Consolidated Order*\n${consolidatedOrder.orderIds.length} orders\nTotal: €${consolidatedOrder.totalPrice.toFixed(2)}\n\n*Items:*\n${orderText}`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
   const handleLogout = async () => {
     await db.auth.signOut();
     router.push("/admin/login");
   };
 
-  if (isLoading) {
+  if (!isMounted || isLoading) {
     return <div className="py-8 text-center">Loading orders...</div>;
   }
 
@@ -250,14 +312,14 @@ export const AdminOrderList: React.FC = () => {
           </p>
         ) : (
           <div className="space-y-4">
-            {ordersByStatus.consolidated.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                isSelected={false}
-                onSelect={handleSelectOrder}
-                onMarkCompleted={handleMarkAsCompleted}
-                showSelect={false}
+            {ordersByStatus.consolidated.map((consolidatedOrder: any) => (
+              <ConsolidatedOrderCard
+                key={consolidatedOrder.id}
+                consolidatedOrder={consolidatedOrder}
+                onMarkCompleted={handleMarkConsolidatedComplete}
+                onCopy={handleCopyConsolidatedOrder}
+                onWhatsApp={handleWhatsAppConsolidatedOrder}
+                isCopied={copiedConsolidatedId === consolidatedOrder.id}
               />
             ))}
           </div>
@@ -333,7 +395,14 @@ const OrderCard: React.FC<OrderCardProps> = ({
               </h4>
               <p className="text-gray-600">{order.customerPhone}</p>
               <p className="text-sm text-gray-500">
-                {new Date(order.createdAt).toLocaleString()}
+                {new Date(order.createdAt).toLocaleString('en-GB', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: false
+                })}
               </p>
             </div>
           </div>
@@ -362,6 +431,102 @@ const OrderCard: React.FC<OrderCardProps> = ({
           <button
             onClick={() => onMarkCompleted(order.id)}
             className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 py-2 text-white transition-colors hover:bg-green-700"
+          >
+            <Check size={18} />
+            Mark as Completed
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+interface ConsolidatedOrderCardProps {
+  consolidatedOrder: any;
+  onMarkCompleted: (consolidatedId: string, orderIds: string[]) => void;
+  onCopy: (consolidatedOrder: any) => void;
+  onWhatsApp: (consolidatedOrder: any) => void;
+  isCopied: boolean;
+}
+
+const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
+  consolidatedOrder,
+  onMarkCompleted,
+  onCopy,
+  onWhatsApp,
+  isCopied,
+}) => {
+  const itemsArray = Object.entries(consolidatedOrder.items).map(([id, item]: [string, any]) => ({
+    id,
+    name: item.name,
+    quantity: item.quantity,
+    price: item.price,
+  }));
+
+  return (
+    <div className="rounded-lg border-2 border-blue-400 bg-blue-50 shadow-md">
+      <div className="p-4">
+        <div className="mb-3 flex items-start justify-between">
+          <div className="flex-1">
+            <h4 className="text-lg font-bold text-gray-800">
+              Consolidated Order ({consolidatedOrder.orderIds.length} orders)
+            </h4>
+            <p className="text-sm text-gray-500">
+              {new Date(consolidatedOrder.createdAt).toLocaleString('en-GB', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              })}
+            </p>
+          </div>
+          <span className="text-xl font-bold text-primary-700">
+            €{consolidatedOrder.totalPrice.toFixed(2)}
+          </span>
+        </div>
+
+        <div className="mb-3 rounded bg-white p-3">
+          <h5 className="mb-2 font-semibold text-gray-700">Aggregated Items:</h5>
+          <ul className="space-y-1">
+            {itemsArray.map((item) => (
+              <li key={item.id} className="flex justify-between text-gray-700">
+                <span>
+                  {item.quantity}x {item.name}
+                </span>
+                <span className="font-medium">
+                  €{(item.price * item.quantity).toFixed(2)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => onCopy(consolidatedOrder)}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-md border py-2 transition-colors ${
+              isCopied
+                ? "border-green-500 bg-green-50 text-green-700"
+                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <Copy size={18} />
+            {isCopied ? "Copied!" : "Copy"}
+          </button>
+          <button
+            onClick={() => onWhatsApp(consolidatedOrder)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border border-green-600 bg-green-600 py-2 text-white transition-colors hover:bg-green-700"
+          >
+            <MessageCircle size={18} />
+            WhatsApp
+          </button>
+        </div>
+        {consolidatedOrder.status === "pending" && (
+          <button
+            onClick={() => onMarkCompleted(consolidatedOrder.id, consolidatedOrder.orderIds)}
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 py-2 text-white transition-colors hover:bg-blue-700"
           >
             <Check size={18} />
             Mark as Completed
