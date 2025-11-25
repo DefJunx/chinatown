@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-11-25
+
+### Added
+
+- **Footer Component**
+  - Added site-wide footer with branding "Made with 🧡 by Webformat"
+  - Webformat link directs to https://www.webformat.com/
+  - Dynamic version display pulled from package.json
+  - Responsive design with mobile-friendly layout
+  - Consistent styling across customer and admin sections
+  - Fixed positioning at bottom of page with flex layout
+
+### Changed
+- Updated customer and admin layouts to include footer
+- Added flex-grow to main content areas for proper footer positioning
+
+---
+
 ## [1.1.0] - 2025-11-25
 
 ### Added
@@ -229,6 +247,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support
 - Dish images
 
+[1.2.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.2.0
 [1.1.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.1.0
 [1.0.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.0.0
 

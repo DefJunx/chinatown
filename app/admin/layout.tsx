@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { db } from "@/lib/instant";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 export default function AdminLayout({
   children,
@@ -66,9 +67,10 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Header />
-      {children}
+      <div className="flex-grow">{children}</div>
+      <Footer />
     </div>
   );
 }
