@@ -20,6 +20,7 @@ interface CartContextType {
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
   isHydrated: boolean;
+  lastItemAdded: number; // timestamp of last item added for animation trigger
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -40,6 +41,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [lastItemAdded, setLastItemAdded] = useState(0);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -71,6 +73,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       }
       return [...currentItems, { ...item, quantity: 1 }];
     });
+    setLastItemAdded(Date.now());
   };
 
   const removeItem = (itemId: string) => {
@@ -115,6 +118,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     isCartOpen,
     setIsCartOpen,
     isHydrated,
+    lastItemAdded,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

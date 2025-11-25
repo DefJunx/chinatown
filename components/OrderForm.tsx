@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { db, id } from "@/lib/instant";
 import { X } from "lucide-react";
@@ -21,6 +21,22 @@ export const OrderForm: React.FC<OrderFormProps> = ({
   const [customerName, setCustomerName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setIsClosing(false);
+    } else if (shouldRender) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+        setIsClosing(false);
+      }, 300); // Match animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, shouldRender]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,32 +82,40 @@ export const OrderForm: React.FC<OrderFormProps> = ({
     }
   };
 
-  if (!isOpen) return null;
+  const handleClose = () => {
+    onClose();
+  };
+
+  if (!shouldRender) return null;
 
   return (
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-        onClick={onClose}
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 ${
+          isClosing ? "animate-fade-out" : "animate-fade-in"
+        }`}
+        onClick={handleClose}
       >
         {/* Modal */}
         <div
-          className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+          className={`relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl ${
+            isClosing ? "animate-fade-out" : "animate-scale-in"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={onClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+            onClick={handleClose}
+            className="absolute right-4 top-4 text-gray-400 transition-all hover:text-gray-600 hover:rotate-90 hover:scale-110"
             aria-label="Chiudi"
           >
             <X size={24} />
           </button>
 
           {showSuccess ? (
-            <div className="py-8 text-center">
+            <div className="py-8 text-center animate-bounce-in">
               <div className="mb-4 flex items-center justify-center">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-500 text-5xl font-bold text-white">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-green-500 text-5xl font-bold text-white animate-scale-in shadow-lg">
                   ✓
                 </div>
               </div>
@@ -122,7 +146,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     required
-                    className="w-full rounded-md border border-gray-300 px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full rounded-md border border-gray-300 px-4 py-2 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500 focus:scale-[1.01]"
                     placeholder="Inserisci il tuo nome"
                   />
                 </div>
@@ -139,7 +163,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-colors duration-200 hover:bg-primary-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-md bg-primary-600 py-3 font-semibold text-white transition-all duration-200 hover:bg-primary-700 hover:scale-105 hover:shadow-lg active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                 >
                   {isSubmitting ? "Invio in corso..." : "Conferma Ordine"}
                 </button>

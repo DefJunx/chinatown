@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { AlertTriangle, X } from "lucide-react";
 
 interface ConfirmDialogProps {
@@ -24,12 +24,33 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   cancelText = "Annulla",
   variant = "warning",
 }) => {
-  if (!isOpen) return null;
+  const [isClosing, setIsClosing] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      setIsClosing(false);
+    } else if (shouldRender) {
+      setIsClosing(true);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+        setIsClosing(false);
+      }, 300); // Match animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, shouldRender]);
+
+  const handleClose = () => {
+    onClose();
+  };
 
   const handleConfirm = () => {
     onConfirm();
-    onClose();
+    handleClose();
   };
+
+  if (!shouldRender) return null;
 
   const variantStyles = {
     danger: {
@@ -58,25 +79,29 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
-        onClick={onClose}
+        className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 ${
+          isClosing ? "animate-fade-out" : "animate-fade-in"
+        }`}
+        onClick={handleClose}
       >
         {/* Modal */}
         <div
-          className="relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+          className={`relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl ${
+            isClosing ? "animate-fade-out" : "animate-scale-in"
+          }`}
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={onClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+            onClick={handleClose}
+            className="absolute right-4 top-4 text-gray-400 transition-all hover:text-gray-600 hover:rotate-90 hover:scale-110"
             aria-label="Chiudi"
           >
             <X size={24} />
           </button>
 
           <div className="mb-4 flex items-start gap-4">
-            <div className={`rounded-full ${styles.bg} p-3`}>
-              <AlertTriangle size={24} className={styles.icon} />
+            <div className={`rounded-full ${styles.bg} p-3 animate-bounce-in`}>
+              <AlertTriangle size={24} className={`${styles.icon} animate-wiggle`} />
             </div>
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-800">{title}</h3>
@@ -86,14 +111,14 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
           <div className="flex gap-3">
             <button
-              onClick={onClose}
-              className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              onClick={handleClose}
+              className="flex-1 rounded-md border border-gray-300 bg-white px-4 py-2 font-medium text-gray-700 transition-all hover:bg-gray-50 hover:scale-105 active:scale-95"
             >
               {cancelText}
             </button>
             <button
               onClick={handleConfirm}
-              className={`flex-1 rounded-md px-4 py-2 font-medium text-white transition-colors ${styles.button}`}
+              className={`flex-1 rounded-md px-4 py-2 font-medium text-white transition-all hover:scale-105 active:scale-95 hover:shadow-lg ${styles.button}`}
             >
               {confirmText}
             </button>

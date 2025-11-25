@@ -17,7 +17,7 @@ export function AdminFloatingButton() {
   return (
     <button
       onClick={() => router.push("/admin/dashboard")}
-      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary-700 text-white shadow-lg transition-all duration-200 hover:bg-primary-800 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+      className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary-700 text-white shadow-lg transition-all duration-200 hover:bg-primary-800 hover:scale-110 hover:shadow-2xl hover:rotate-90 active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 animate-bounce-in"
       aria-label="Vai alla Dashboard Admin"
       title="Dashboard Admin"
     >

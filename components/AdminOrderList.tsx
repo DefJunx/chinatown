@@ -226,7 +226,7 @@ export const AdminOrderList: React.FC = () => {
   };
 
   if (!isMounted || isLoading) {
-    return <div className="py-8 text-center">Caricamento ordini...</div>;
+    return <div className="py-8 text-center animate-pulse">Caricamento ordini...</div>;
   }
 
   if (error) {
@@ -240,19 +240,19 @@ export const AdminOrderList: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-fade-in-up">
         <h2 className="text-2xl font-bold text-gray-800">Gestione Ordini</h2>
         <div className="flex gap-2">
           <button
             onClick={handleClearAllOrders}
-            className="flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-white transition-colors hover:bg-red-700"
+            className="flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-white transition-all hover:bg-red-700 hover:scale-105 hover:shadow-lg active:scale-95"
           >
             <Trash2 size={18} />
             Elimina Tutti gli Ordini
           </button>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-300"
+            className="flex items-center gap-2 rounded-md bg-gray-200 px-4 py-2 text-gray-700 transition-all hover:bg-gray-300 hover:scale-105 active:scale-95"
           >
             <LogOut size={18} />
             Esci
@@ -262,7 +262,7 @@ export const AdminOrderList: React.FC = () => {
 
       {/* Consolidate Actions */}
       {selectedOrders.size > 0 && (
-        <div className="rounded-lg border border-primary-200 bg-primary-50 p-4">
+        <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 animate-scale-in">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <p className="font-medium text-primary-800">
               {selectedOrders.size} ordine/i selezionato/i
@@ -270,14 +270,14 @@ export const AdminOrderList: React.FC = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleCopyConsolidated}
-                className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 transition-colors hover:bg-gray-100"
+                className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 transition-all hover:bg-gray-100 hover:scale-105 active:scale-95"
               >
                 <Copy size={18} />
                 Copia Lista
               </button>
               <button
                 onClick={handleConsolidateOrders}
-                className="flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-white transition-colors hover:bg-primary-700"
+                className="flex items-center gap-2 rounded-md bg-primary-600 px-4 py-2 text-white transition-all hover:bg-primary-700 hover:scale-105 hover:shadow-lg active:scale-95"
               >
                 <Package size={18} />
                 Consolida
@@ -289,7 +289,7 @@ export const AdminOrderList: React.FC = () => {
 
       {/* Copied notification */}
       {copiedText && (
-        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4 animate-bounce-in">
           <p className="mb-2 font-medium text-green-800">
             Copiato negli appunti:
           </p>
@@ -383,8 +383,8 @@ const OrderCard: React.FC<OrderCardProps> = ({
 }) => {
   return (
     <div
-      className={`rounded-lg border-2 bg-white shadow-md transition-all ${
-        isSelected ? "border-primary-500" : "border-gray-200"
+      className={`rounded-lg border-2 bg-white shadow-md transition-all hover:shadow-lg animate-fade-in-up ${
+        isSelected ? "border-primary-500 scale-[1.02]" : "border-gray-200"
       }`}
     >
       <div className="p-4">
@@ -395,7 +395,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => onSelect(order.id)}
-                className="mt-1 h-5 w-5 rounded text-primary-600 focus:ring-primary-500"
+                className="mt-1 h-5 w-5 rounded text-primary-600 focus:ring-primary-500 cursor-pointer transition-transform hover:scale-110"
               />
             )}
             <div className="flex-1">
@@ -461,7 +461,7 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
   }));
 
   return (
-    <div className="rounded-lg border-2 border-blue-400 bg-blue-50 shadow-md">
+    <div className="rounded-lg border-2 border-blue-400 bg-blue-50 shadow-md hover:shadow-xl transition-all animate-fade-in-up">
       <div className="p-4">
         <div className="mb-3 flex items-start justify-between">
           <div className="flex-1">
@@ -503,9 +503,9 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
         <div className="flex gap-2">
           <button
             onClick={() => onCopy(consolidatedOrder)}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-md border py-2 transition-colors ${
+            className={`flex flex-1 items-center justify-center gap-2 rounded-md border py-2 transition-all hover:scale-105 active:scale-95 ${
               isCopied
-                ? "border-green-500 bg-green-50 text-green-700"
+                ? "border-green-500 bg-green-50 text-green-700 animate-success-bounce"
                 : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
             }`}
           >
@@ -514,7 +514,7 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
           </button>
           <button
             onClick={() => onWhatsApp(consolidatedOrder)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-md border border-green-600 bg-green-600 py-2 text-white transition-colors hover:bg-green-700"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border border-green-600 bg-green-600 py-2 text-white transition-all hover:bg-green-700 hover:scale-105 hover:shadow-lg active:scale-95"
           >
             <MessageCircle size={18} />
             WhatsApp

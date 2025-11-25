@@ -28,11 +28,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   }, [searchQuery, onSearchChange]);
 
   return (
-    <div className="mb-6 rounded-lg bg-white p-4 shadow-md">
+    <div className="mb-6 rounded-lg bg-white p-4 shadow-md animate-fade-in-up">
       {/* Search Input */}
       <div className="relative mb-4">
         <Search
-          className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400"
+          className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-400 transition-colors"
           size={20}
         />
         <input
@@ -40,7 +40,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Cerca piatti..."
-          className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-full rounded-md border border-gray-300 py-2 pl-10 pr-4 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500 focus:scale-[1.02]"
         />
       </div>
 
@@ -48,9 +48,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => onCategoryChange("All")}
-          className={`rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+          className={`rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${
             selectedCategory === "All"
-              ? "bg-primary-600 text-white"
+              ? "bg-primary-600 text-white shadow-md"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
@@ -60,9 +60,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           <button
             key={category}
             onClick={() => onCategoryChange(category)}
-            className={`rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+            className={`rounded-md px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95 ${
               selectedCategory === category
-                ? "bg-primary-600 text-white"
+                ? "bg-primary-600 text-white shadow-md"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ShoppingCart, BarChart3 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
@@ -11,8 +11,19 @@ interface HeaderProps {
 }
 
 export function Header({ showCart = false }: HeaderProps) {
-  const { totalItems, setIsCartOpen, isHydrated } = useCart();
+  const { totalItems, setIsCartOpen, isHydrated, lastItemAdded } = useCart();
   const pathname = usePathname();
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  useEffect(() => {
+    if (lastItemAdded > 0) {
+      setShouldAnimate(true);
+      const timer = setTimeout(() => {
+        setShouldAnimate(false);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [lastItemAdded]);
 
   return (
     <header className="sticky top-0 z-30 bg-primary-700 text-white shadow-lg">
@@ -73,12 +84,18 @@ export function Header({ showCart = false }: HeaderProps) {
             {showCart && (
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="relative rounded-full bg-white p-3 text-primary-700 transition-colors duration-200 hover:bg-gray-100"
+                className={`relative rounded-full bg-white p-3 text-primary-700 transition-all duration-200 hover:bg-gray-100 hover:scale-110 ${
+                  shouldAnimate ? "animate-wiggle" : ""
+                }`}
                 aria-label="Apri carrello"
               >
                 <ShoppingCart size={24} />
                 {isHydrated && totalItems > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 text-xs font-bold text-primary-900">
+                  <span
+                    className={`absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-yellow-400 text-xs font-bold text-primary-900 transition-transform ${
+                      shouldAnimate ? "animate-cart-badge-bounce" : ""
+                    }`}
+                  >
                     {totalItems}
                   </span>
                 )}

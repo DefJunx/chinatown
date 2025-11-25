@@ -47,21 +47,30 @@ export const MenuGrid: React.FC = () => {
       />
 
       {filteredMenuData.length === 0 ? (
-        <div className="py-12 text-center">
+        <div className="py-12 text-center animate-fade-in">
           <p className="text-lg text-gray-500">
             Nessun piatto trovato con i criteri specificati.
           </p>
         </div>
       ) : (
         <div className="space-y-8">
-          {filteredMenuData.map((category) => (
-            <div key={category!.name}>
+          {filteredMenuData.map((category, categoryIndex) => (
+            <div
+              key={category!.name}
+              className="animate-fade-in-up"
+              style={{ animationDelay: `${categoryIndex * 100}ms` }}
+            >
               <h2 className="mb-4 border-b-2 border-primary-600 pb-2 text-3xl font-bold text-primary-800">
                 {category!.name}
               </h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {category!.items.map((item) => (
-                  <DishCard key={item.id} item={item} />
+                {category!.items.map((item, itemIndex) => (
+                  <div
+                    key={item.id}
+                    style={{ animationDelay: `${(categoryIndex * 100) + (itemIndex * 50)}ms` }}
+                  >
+                    <DishCard item={item} />
+                  </div>
                 ))}
               </div>
             </div>
