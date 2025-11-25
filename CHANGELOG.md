@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-11-25
+
+### Added
+
+#### UI/UX Improvements
+- **Smooth Animations & Transitions**
+  - Fade-in animations for menu items on initial load
+  - Staggered entrance animations for dish cards (50ms delay per item)
+  - Smooth slide-in animations for cart panel
+  - Hover scale effects on interactive elements
+  - Button press feedback with scale animations
+  - Loading state animations for async operations
+  - Modal entrance/exit animations with backdrop fade
+  - Toast notification animations
+
+#### Documentation Enhancements
+- **Organized Documentation Structure**
+  - Created dedicated `/docs` folder for all documentation
+  - Comprehensive animations documentation (`ANIMATIONS_SUMMARY.md`)
+  - Animation testing guide (`ANIMATIONS_TEST_GUIDE.md`)
+  - Admin registration feature docs (English & Italian)
+  - Complete feature documentation (English & Italian)
+  - Deployment guide
+  - Quick start guide
+  - Setup instructions
+  - Project summary
+
+### Changed
+- Improved user experience with smooth transitions throughout the application
+- Enhanced visual feedback for all interactive elements
+- Better organization of project documentation
+
+### Technical Details
+- Added CSS transition properties to key components
+- Implemented staggered animations using delay calculations
+- Optimized animation performance with transform-based animations
+
+---
+
 ## [1.0.0] - 2025-11-24
 
 ### Added
@@ -190,5 +229,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support
 - Dish images
 
+[1.1.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.1.0
 [1.0.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.0.0
 
