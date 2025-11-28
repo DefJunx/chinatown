@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2025-11-28
+
+### Added
+
+- **Order Control Feature**
+  - Admin toggle to enable/disable ordering system
+  - System setting `allowOrdering` in SystemSettings schema
+  - Customer-facing "Ordinazioni chiuse!" message when ordering is disabled
+  - Conditional rendering of cart icon and cart sidebar based on ordering status
+  - Real-time updates when admin changes ordering status
+  - Toast notifications for ordering status changes
+
+### Changed
+
+- Updated customer layout to conditionally show cart functionality
+- Updated customer home page to display closure message when ordering is disabled
+- Enhanced admin dashboard with ordering control toggle
+- Extended SystemSettings interface to include `allowOrdering` field
+
+---
+
 ## [1.2.0] - 2025-11-25
 
 ### Added
@@ -247,6 +268,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-language support
 - Dish images
 
+[1.3.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.3.0
 [1.2.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.2.0
 [1.1.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.1.0
 [1.0.0]: https://github.com/DefJunx/chinatown/releases/tag/v1.0.0

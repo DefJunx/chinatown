@@ -4,6 +4,7 @@ import type { Order, ConsolidatedOrder } from "@/types";
 export interface SystemSettings {
   id: string;
   allowAdminRegistration: boolean;
+  allowOrdering: boolean;
   updatedAt: number;
 }
 

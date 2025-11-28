@@ -11,7 +11,9 @@ export default function AdminDashboardPage() {
   const router = useRouter();
   const { data } = db.useQuery({ systemSettings: {} });
   const [allowAdminRegistration, setAllowAdminRegistration] = useState(false);
+  const [allowOrdering, setAllowOrdering] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingOrdering, setIsSavingOrdering] = useState(false);
   const [settingsId, setSettingsId] = useState<string | null>(null);
 
   // Load current settings
@@ -19,6 +21,7 @@ export default function AdminDashboardPage() {
     if (data?.systemSettings && data.systemSettings.length > 0) {
       const settings = data.systemSettings[0] as any;
       setAllowAdminRegistration(settings.allowAdminRegistration ?? false);
+      setAllowOrdering(settings.allowOrdering ?? true);
       setSettingsId(settings.id);
     }
   }, [data]);
@@ -34,6 +37,7 @@ export default function AdminDashboardPage() {
       await db.transact([
         db.tx.systemSettings[targetId].update({
           allowAdminRegistration: newValue,
+          allowOrdering: allowOrdering,
           updatedAt: Date.now(),
         }),
       ]);
@@ -54,6 +58,41 @@ export default function AdminDashboardPage() {
       toast.error("Impossibile aggiornare le impostazioni. Riprova.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleToggleOrdering = async () => {
+    setIsSavingOrdering(true);
+    const newValue = !allowOrdering;
+
+    try {
+      // If no settings exist yet, create with a new UUID
+      const targetId = settingsId || id();
+
+      await db.transact([
+        db.tx.systemSettings[targetId].update({
+          allowAdminRegistration: allowAdminRegistration,
+          allowOrdering: newValue,
+          updatedAt: Date.now(),
+        }),
+      ]);
+
+      // Update local state
+      if (!settingsId) {
+        setSettingsId(targetId);
+      }
+      setAllowOrdering(newValue);
+
+      toast.success(
+        newValue
+          ? "Ordinazioni abilitate"
+          : "Ordinazioni disabilitate"
+      );
+    } catch (err) {
+      console.error("Failed to update settings:", err);
+      toast.error("Impossibile aggiornare le impostazioni. Riprova.");
+    } finally {
+      setIsSavingOrdering(false);
     }
   };
 
@@ -93,6 +132,31 @@ export default function AdminDashboardPage() {
             <span
               className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
                 allowAdminRegistration ? "translate-x-7" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Ordering Toggle */}
+        <div className="mt-6 flex items-center justify-between border-t border-gray-200 pt-6">
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-800">
+              Consenti Ordinazioni
+            </h3>
+            <p className="text-sm text-gray-600">
+              Abilita o disabilita le ordinazioni. Quando disabilitato, il menu sarà nascosto e verrà mostrato un messaggio di chiusura.
+            </p>
+          </div>
+          <button
+            onClick={handleToggleOrdering}
+            disabled={isSavingOrdering}
+            className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+              allowOrdering ? "bg-primary-600" : "bg-gray-300"
+            }`}
+          >
+            <span
+              className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                allowOrdering ? "translate-x-7" : "translate-x-1"
               }`}
             />
           </button>
