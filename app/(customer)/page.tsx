@@ -5,7 +5,19 @@ import { MenuGrid } from "@/components/MenuGrid";
 import { db } from "@/lib/instant";
 
 export default function HomePage() {
-  const { data } = db.useQuery({ systemSettings: {} });
+  const { data, isLoading } = db.useQuery({ systemSettings: {} });
+
+  // Wait for data to load before rendering to prevent flicker
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-primary-600 border-r-transparent"></div>
+          <p className="text-gray-600">Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Get allowOrdering setting, default to true if no settings exist
   const allowOrdering = data?.systemSettings && data.systemSettings.length > 0
