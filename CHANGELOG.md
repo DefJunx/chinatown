@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-12-03
+
+### Added
+
+- **OrderDetailModal Component**
+  - New modal component for viewing detailed information about consolidated orders
+  - Displays individual orders within a consolidated order
+  - Shows customer details, items, and pricing for each order
+  - Ability to remove individual orders from consolidated orders
+  - Smooth animations and responsive design
+
+### Changed
+
+- **AdminOrderList Refactoring**
+  - Replaced multi-select checkbox workflow with streamlined "Mark as Paid" button
+  - Simplified order consolidation process - orders are automatically consolidated when marked as paid
+  - Improved UX by removing complex selection UI in favor of direct action buttons
+  - Added "Dettagli" (Details) button to consolidated orders for quick access to order details
+  - Orders are automatically added to today's pending consolidated order or create a new one
+  - Enhanced visual feedback with CheckCircle2 icon for paid status
+
+---
+
 ## [1.3.1] - 2025-11-28
 
 ### Changed
