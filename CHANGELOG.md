@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-12-05
+
+### Added
+
+- **Utensils Selection Feature**
+  - Added forks and chopsticks selection to order form
+  - Customers can now request forks and/or chopsticks when placing orders
+  - Utensils are displayed in order cards and consolidated order views
+  - Utensils are included in copy-to-clipboard and WhatsApp sharing functionality
+  - Utensils are properly aggregated when consolidating multiple orders
+  - Utensils are properly subtracted when removing orders from consolidated orders
+
+### Changed
+
+- **Order Management**
+  - Updated Order and ConsolidatedOrder types to include optional `forks` and `chopsticks` fields
+  - Enhanced order consolidation logic to sum utensils from multiple orders
+  - Improved order removal logic to subtract utensils from consolidated orders
+  - Updated order display components to show utensils information when present
+
+---
+
 ## [1.4.0] - 2025-12-03
 
 ### Added

@@ -75,6 +75,10 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
       // Subtract order total price
       const updatedTotalPrice = consolidatedOrder.totalPrice - order.totalPrice;
 
+      // Subtract forks and chopsticks
+      const updatedForks = Math.max(0, (consolidatedOrder.forks || 0) - (order.forks || 0));
+      const updatedChopsticks = Math.max(0, (consolidatedOrder.chopsticks || 0) - (order.chopsticks || 0));
+
       // Prepare transactions
       const transactions = [];
 
@@ -90,6 +94,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             orderIds: updatedOrderIds,
             items: updatedItems,
             totalPrice: updatedTotalPrice,
+            forks: updatedForks,
+            chopsticks: updatedChopsticks,
           })
         );
       }
@@ -197,6 +203,19 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                         </li>
                       ))}
                     </ul>
+                    {((order.forks ?? 0) > 0) || ((order.chopsticks ?? 0) > 0) ? (
+                      <div className="mt-3 border-t border-gray-200 pt-2">
+                        <h6 className="mb-1 text-sm font-semibold text-gray-700">Posate:</h6>
+                        <ul className="space-y-1 text-sm text-gray-600">
+                          {(order.forks ?? 0) > 0 && (
+                            <li>Forchette: {order.forks}</li>
+                          )}
+                          {(order.chopsticks ?? 0) > 0 && (
+                            <li>Bacchette: {order.chopsticks}</li>
+                          )}
+                        </ul>
+                      </div>
+                    ) : null}
                     <div className="mt-3 border-t border-gray-200 pt-2">
                       <div className="flex justify-between font-semibold text-gray-800">
                         <span>Totale Ordine:</span>

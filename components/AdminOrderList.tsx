@@ -83,11 +83,17 @@ export const AdminOrderList: React.FC = () => {
         });
         updatedTotalPrice += order.totalPrice;
 
+        // Sum forks and chopsticks
+        const updatedForks = (targetConsolidatedOrder.forks || 0) + (order.forks || 0);
+        const updatedChopsticks = (targetConsolidatedOrder.chopsticks || 0) + (order.chopsticks || 0);
+
         await db.transact([
           db.tx.consolidatedOrders[targetConsolidatedOrder.id].update({
             orderIds: [...targetConsolidatedOrder.orderIds, order.id],
             items: updatedItemsMap,
             totalPrice: updatedTotalPrice,
+            forks: updatedForks,
+            chopsticks: updatedChopsticks,
           }),
           db.tx.orders[order.id].update({ status: "consolidated" }),
         ]);
@@ -118,6 +124,8 @@ export const AdminOrderList: React.FC = () => {
             status: "pending",
             createdAt: Date.now(),
             adminId: user?.id || "unknown",
+            forks: order.forks || 0,
+            chopsticks: order.chopsticks || 0,
           }),
           db.tx.orders[order.id].update({ status: "consolidated" }),
         ]);
@@ -138,9 +146,21 @@ export const AdminOrderList: React.FC = () => {
       price: item.price,
     }));
 
-    const text = itemsArray
+    let text = itemsArray
       .map((item) => `${item.quantity}x ${item.name}`)
       .join("\n");
+
+    // Add forks and chopsticks if present
+    const utensils: string[] = [];
+    if (consolidatedOrder.forks && consolidatedOrder.forks > 0) {
+      utensils.push(`Forchette: ${consolidatedOrder.forks}`);
+    }
+    if (consolidatedOrder.chopsticks && consolidatedOrder.chopsticks > 0) {
+      utensils.push(`Bacchette: ${consolidatedOrder.chopsticks}`);
+    }
+    if (utensils.length > 0) {
+      text += "\n\n" + utensils.join("\n");
+    }
 
     navigator.clipboard.writeText(text);
     setCopiedConsolidatedId(consolidatedOrder.id);
@@ -159,7 +179,17 @@ export const AdminOrderList: React.FC = () => {
       .map((item) => `${item.quantity}x ${item.name}`)
       .join("\n");
 
-    const message = `*Ordine Consolidato*\n${consolidatedOrder.orderIds.length} ordini\nTotale: €${consolidatedOrder.totalPrice.toFixed(2)}\n\n*Piatti:*\n${orderText}`;
+    // Add forks and chopsticks if present
+    const utensils: string[] = [];
+    if (consolidatedOrder.forks && consolidatedOrder.forks > 0) {
+      utensils.push(`Forchette: ${consolidatedOrder.forks}`);
+    }
+    if (consolidatedOrder.chopsticks && consolidatedOrder.chopsticks > 0) {
+      utensils.push(`Bacchette: ${consolidatedOrder.chopsticks}`);
+    }
+    const utensilsText = utensils.length > 0 ? `\n\n*Posate:*\n${utensils.join("\n")}` : "";
+
+    const message = `*Ordine Consolidato*\n${consolidatedOrder.orderIds.length} ordini\nTotale: €${consolidatedOrder.totalPrice.toFixed(2)}\n\n*Piatti:*\n${orderText}${utensilsText}`;
 
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, "_blank");
@@ -372,6 +402,19 @@ const OrderCard: React.FC<OrderCardProps> = ({
               </li>
             ))}
           </ul>
+          {((order.forks ?? 0) > 0) || ((order.chopsticks ?? 0) > 0) ? (
+            <div className="mt-3 border-t border-gray-200 pt-2">
+              <h5 className="mb-1 text-sm font-semibold text-gray-700">Posate:</h5>
+              <ul className="space-y-1 text-sm text-gray-600">
+                {(order.forks ?? 0) > 0 && (
+                  <li>Forchette: {order.forks}</li>
+                )}
+                {(order.chopsticks ?? 0) > 0 && (
+                  <li>Bacchette: {order.chopsticks}</li>
+                )}
+              </ul>
+            </div>
+          ) : null}
         </div>
 
         <button
@@ -446,6 +489,19 @@ const ConsolidatedOrderCard: React.FC<ConsolidatedOrderCardProps> = ({
               </li>
             ))}
           </ul>
+          {((consolidatedOrder.forks ?? 0) > 0) || ((consolidatedOrder.chopsticks ?? 0) > 0) ? (
+            <div className="mt-3 border-t border-gray-200 pt-2">
+              <h5 className="mb-1 text-sm font-semibold text-gray-700">Posate:</h5>
+              <ul className="space-y-1 text-sm text-gray-600">
+                {(consolidatedOrder.forks ?? 0) > 0 && (
+                  <li>Forchette: {consolidatedOrder.forks}</li>
+                )}
+                {(consolidatedOrder.chopsticks ?? 0) > 0 && (
+                  <li>Bacchette: {consolidatedOrder.chopsticks}</li>
+                )}
+              </ul>
+            </div>
+          ) : null}
         </div>
 
         <div className="flex gap-2">

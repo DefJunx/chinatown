@@ -22,6 +22,8 @@ export interface Order {
   totalPrice: number;
   status: "pending" | "consolidated" | "completed";
   createdAt: number;
+  forks?: number;
+  chopsticks?: number;
 }
 
 export interface ConsolidatedOrder {
@@ -32,4 +34,6 @@ export interface ConsolidatedOrder {
   status: "pending" | "completed";
   createdAt: number;
   adminId: string;
+  forks?: number;
+  chopsticks?: number;
 }

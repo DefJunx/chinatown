@@ -19,6 +19,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 }) => {
   const { items, totalPrice, clearCart } = useCart();
   const [customerName, setCustomerName] = useState("");
+  const [forks, setForks] = useState(false);
+  const [chopsticks, setChopsticks] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -46,20 +48,30 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 
     try {
       // Submit order to InstantDB
+      const orderData: any = {
+        customerName,
+        items: items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          category: item.category,
+        })),
+        totalPrice,
+        status: "pending",
+        createdAt: Date.now(),
+      };
+
+      // Only include forks/chopsticks if they are selected
+      if (forks) {
+        orderData.forks = 1;
+      }
+      if (chopsticks) {
+        orderData.chopsticks = 1;
+      }
+
       await db.transact([
-        db.tx.orders[id()].update({
-          customerName,
-          items: items.map((item) => ({
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            category: item.category,
-          })),
-          totalPrice,
-          status: "pending",
-          createdAt: Date.now(),
-        }),
+        db.tx.orders[id()].update(orderData),
       ]);
 
       // Clear cart and show success
@@ -68,6 +80,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 
       // Reset form
       setCustomerName("");
+      setForks(false);
+      setChopsticks(false);
 
       // Close after 2 seconds
       setTimeout(() => {
@@ -149,6 +163,32 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                     className="w-full rounded-md border border-gray-300 px-4 py-2 transition-all focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary-500 focus:scale-[1.01]"
                     placeholder="Inserisci il tuo nome"
                   />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Posate
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={forks}
+                        onChange={(e) => setForks(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-gray-700">Forchetta</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={chopsticks}
+                        onChange={(e) => setChopsticks(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                      />
+                      <span className="text-sm text-gray-700">Bacchette</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="mt-4 rounded-lg bg-gray-50 p-4">
