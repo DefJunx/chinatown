@@ -14,7 +14,7 @@
   "dependencies": {
     "@instantdb/react": "^0.14.2",
     "lucide-react": "^0.460.0",
-    "next": "^15.0.3",
+    "next": "15.0.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sonner": "^2.0.7"
