@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
+import { useUserProfile } from "@/contexts/UserProfileContext";
 import { db, id } from "@/lib/instant";
 import { X } from "lucide-react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
   onSuccess,
 }) => {
   const { items, totalPrice, clearCart } = useCart();
+  const { user, profile } = useUserProfile();
   const [customerName, setCustomerName] = useState("");
   const [forks, setForks] = useState(false);
   const [chopsticks, setChopsticks] = useState(false);
@@ -25,6 +27,38 @@ export const OrderForm: React.FC<OrderFormProps> = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [shouldRender, setShouldRender] = useState(false);
+  const [preferencesInitialized, setPreferencesInitialized] = useState(false);
+
+  // Initialize form with profile data when modal opens
+  useEffect(() => {
+    if (isOpen && profile && !preferencesInitialized) {
+      // Set customer name from profile
+      const fullName = `${profile.firstName} ${profile.lastName}`.trim();
+      if (fullName) {
+        setCustomerName(fullName);
+      }
+
+      // Set cutlery preference
+      if (profile.preferredCutlery === "forks") {
+        setForks(true);
+        setChopsticks(false);
+      } else if (profile.preferredCutlery === "chopsticks") {
+        setForks(false);
+        setChopsticks(true);
+      } else {
+        setForks(false);
+        setChopsticks(false);
+      }
+      setPreferencesInitialized(true);
+    }
+  }, [isOpen, profile, preferencesInitialized]);
+
+  // Reset preferences initialization when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setPreferencesInitialized(false);
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -62,6 +96,11 @@ export const OrderForm: React.FC<OrderFormProps> = ({
         createdAt: Date.now(),
       };
 
+      // Include userId if user is authenticated
+      if (user) {
+        orderData.userId = user.id;
+      }
+
       // Only include forks/chopsticks if they are selected
       if (forks) {
         orderData.forks = 1;
@@ -70,9 +109,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
         orderData.chopsticks = 1;
       }
 
-      await db.transact([
-        db.tx.orders[id()].update(orderData),
-      ]);
+      await db.transact([db.tx.orders[id()].update(orderData)]);
 
       // Clear cart and show success
       clearCart();

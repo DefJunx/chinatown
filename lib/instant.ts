@@ -1,5 +1,5 @@
 import { init, id } from "@instantdb/react";
-import type { Order, ConsolidatedOrder } from "@/types";
+import type { Order, ConsolidatedOrder, UserProfile } from "@/types";
 
 export interface SystemSettings {
   id: string;
@@ -13,6 +13,7 @@ export const schema = {
   orders: {} as Order,
   consolidatedOrders: {} as ConsolidatedOrder,
   systemSettings: {} as SystemSettings,
+  userProfiles: {} as UserProfile,
 };
 
 // Get the app ID from environment variables

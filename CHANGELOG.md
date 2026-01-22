@@ -5,6 +5,75 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-12-05
+
+### Added
+
+- **User Authentication System**
+  - Magic code email authentication for customer login
+  - Secure login page with email verification code flow
+  - Automatic account creation for new users
+  - Session management with InstantDB authentication
+  - Protected customer routes requiring authentication
+
+- **User Profile System**
+  - Customer profile creation and management page
+  - Profile fields: first name, last name, preferred cutlery (forks/chopsticks/none)
+  - Profile preferences automatically populate order form
+  - Admin profile setup page for administrative users
+  - UserProfileContext for centralized user profile state management
+  - Profile data persisted in InstantDB userProfiles schema
+
+- **Order History Page**
+  - New `/orders` route for customers to view their order history
+  - Displays all orders placed by the authenticated user
+  - Shows order status badges (In Attesa, In Elaborazione, Completato)
+  - Displays order details including items, utensils, pricing, and timestamps
+  - Sorted by date (newest first)
+  - Empty state with call-to-action to browse menu
+
+- **Enhanced Header Navigation**
+  - User menu with profile, orders, and logout options
+  - Mobile-responsive hamburger menu for navigation
+  - Admin dashboard link for admin users
+  - Logout functionality with redirect to login page
+  - Improved navigation with active route highlighting
+
+### Changed
+
+- **Customer Layout**
+  - Now requires authentication for all routes except `/statistics`
+  - Automatic redirect to login page for unauthenticated users
+  - Automatic redirect to profile setup for users without profiles
+  - Loading states during authentication and profile checks
+  - Wrapped with UserProfileProvider for profile state management
+
+- **Admin Layout**
+  - Enhanced profile checking for admin users
+  - Automatic redirect to admin profile setup for admins without profiles
+  - Redirect to customer area for non-admin users
+  - Profile-based admin access control
+
+- **Order Form**
+  - Pre-fills customer name from user profile
+  - Pre-selects preferred cutlery from user profile
+  - Orders now linked to users via `userId` field
+  - Improved form initialization with profile data
+
+- **Order Management**
+  - Orders now include `userId` field to link orders to users
+  - Enhanced order tracking with user association
+
+### Technical Details
+
+- Added `UserProfile` type to schema with fields: userId, email, firstName, lastName, preferredCutlery, isAdmin
+- Created `UserProfileContext` for centralized profile state management
+- Updated InstantDB schema to include `userProfiles` collection
+- Enhanced route protection logic in both customer and admin layouts
+- Improved loading states and user experience during authentication flows
+
+---
+
 ## [1.5.0] - 2025-12-05
 
 ### Added

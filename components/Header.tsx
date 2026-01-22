@@ -2,18 +2,39 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingCart, BarChart3 } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
+import {
+  ShoppingCart,
+  BarChart3,
+  User,
+  Package,
+  LogOut,
+  Menu as MenuIcon,
+  X,
+} from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { usePathname } from "next/navigation";
+import { db } from "@/lib/instant";
+import type { UserProfile } from "@/types";
 
 interface HeaderProps {
   showCart?: boolean;
 }
 
 export function Header({ showCart = false }: HeaderProps) {
-  const { totalItems, setIsCartOpen, isHydrated, lastItemAdded } = useCart();
+  const router = useRouter();
   const pathname = usePathname();
+  const { totalItems, setIsCartOpen, isHydrated, lastItemAdded } = useCart();
+  const { user } = db.useAuth();
+  const { data: profileData } = db.useQuery(
+    user ? { userProfiles: { $: { where: { userId: user.id } } } } : null
+  );
+
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const profile = (profileData?.userProfiles?.[0] as UserProfile) || null;
+  const isAdmin = profile?.isAdmin || false;
+  const isAdminRoute = pathname.startsWith("/admin");
 
   useEffect(() => {
     if (lastItemAdded > 0) {
@@ -25,6 +46,16 @@ export function Header({ showCart = false }: HeaderProps) {
     }
   }, [lastItemAdded]);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    await db.auth.signOut();
+    router.push("/login");
+  };
+
   return (
     <header className="sticky top-0 z-30 bg-primary-700 text-white shadow-lg">
       <div className="container mx-auto px-4 py-4">
@@ -33,52 +64,79 @@ export function Header({ showCart = false }: HeaderProps) {
             href="/"
             className="transition-opacity duration-200 hover:opacity-80"
           >
-            <h1 className="text-2xl font-bold sm:text-3xl">
-              Ristorante Cinese
-            </h1>
+            <h1 className="text-2xl font-bold sm:text-3xl">Ristorante Cinese</h1>
             <p className="text-sm text-primary-100">
               Ordina i tuoi piatti preferiti
             </p>
           </Link>
 
           <div className="flex items-center gap-4">
-            {/* Navigation Links */}
-            <nav className="hidden sm:flex items-center gap-2">
-              <Link
-                href="/"
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  pathname === "/"
-                    ? "bg-primary-600 text-white"
-                    : "text-primary-100 hover:bg-primary-600"
-                }`}
-              >
-                Menu
-              </Link>
-              <Link
-                href="/statistics"
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                  pathname === "/statistics"
-                    ? "bg-primary-600 text-white"
-                    : "text-primary-100 hover:bg-primary-600"
-                }`}
-              >
-                <BarChart3 size={16} />
-                Statistiche
-              </Link>
-            </nav>
+            {/* Desktop Navigation Links */}
+            {user && !isAdminRoute && (
+              <nav className="hidden md:flex items-center gap-2">
+                <Link
+                  href="/"
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    pathname === "/"
+                      ? "bg-primary-600 text-white"
+                      : "text-primary-100 hover:bg-primary-600"
+                  }`}
+                >
+                  Menu
+                </Link>
+                <Link
+                  href="/orders"
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    pathname === "/orders"
+                      ? "bg-primary-600 text-white"
+                      : "text-primary-100 hover:bg-primary-600"
+                  }`}
+                >
+                  <Package size={16} />
+                  I Miei Ordini
+                </Link>
+                <Link
+                  href="/statistics"
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    pathname === "/statistics"
+                      ? "bg-primary-600 text-white"
+                      : "text-primary-100 hover:bg-primary-600"
+                  }`}
+                >
+                  <BarChart3 size={16} />
+                  Statistiche
+                </Link>
+                <Link
+                  href="/profile"
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+                    pathname === "/profile"
+                      ? "bg-primary-600 text-white"
+                      : "text-primary-100 hover:bg-primary-600"
+                  }`}
+                >
+                  <User size={16} />
+                  Profilo
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-primary-100 transition-colors hover:bg-primary-600"
+                >
+                  <LogOut size={16} />
+                  Esci
+                </button>
+              </nav>
+            )}
 
-            {/* Mobile Stats Link */}
-            <Link
-              href="/statistics"
-              className={`sm:hidden rounded-full p-2 transition-colors ${
-                pathname === "/statistics"
-                  ? "bg-primary-600"
-                  : "hover:bg-primary-600"
-              }`}
-              aria-label="Visualizza statistiche"
-            >
-              <BarChart3 size={20} />
-            </Link>
+            {/* Mobile Menu Button */}
+            {user && !isAdminRoute && (
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden rounded-full p-2 transition-colors hover:bg-primary-600"
+                aria-label="Menu"
+              >
+                {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+              </button>
+            )}
 
             {/* Cart Button */}
             {showCart && (
@@ -103,6 +161,72 @@ export function Header({ showCart = false }: HeaderProps) {
             )}
           </div>
         </div>
+
+        {/* Mobile Navigation Menu */}
+        {user && !isAdminRoute && mobileMenuOpen && (
+          <nav className="md:hidden mt-4 pt-4 border-t border-primary-600 animate-fade-in">
+            <div className="flex flex-col gap-2">
+              <Link
+                href="/"
+                className={`rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  pathname === "/"
+                    ? "bg-primary-600 text-white"
+                    : "text-primary-100 hover:bg-primary-600"
+                }`}
+              >
+                Menu
+              </Link>
+              <Link
+                href="/orders"
+                className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  pathname === "/orders"
+                    ? "bg-primary-600 text-white"
+                    : "text-primary-100 hover:bg-primary-600"
+                }`}
+              >
+                <Package size={16} />
+                I Miei Ordini
+              </Link>
+              <Link
+                href="/statistics"
+                className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  pathname === "/statistics"
+                    ? "bg-primary-600 text-white"
+                    : "text-primary-100 hover:bg-primary-600"
+                }`}
+              >
+                <BarChart3 size={16} />
+                Statistiche
+              </Link>
+              <Link
+                href="/profile"
+                className={`flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors ${
+                  pathname === "/profile"
+                    ? "bg-primary-600 text-white"
+                    : "text-primary-100 hover:bg-primary-600"
+                }`}
+              >
+                <User size={16} />
+                Profilo
+              </Link>
+              {isAdmin && (
+                <Link
+                  href="/admin/dashboard"
+                  className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-primary-100 transition-colors hover:bg-primary-600"
+                >
+                  Admin Dashboard
+                </Link>
+              )}
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-medium text-primary-100 transition-colors hover:bg-primary-600 text-left"
+              >
+                <LogOut size={16} />
+                Esci
+              </button>
+            </div>
+          </nav>
+        )}
       </div>
     </header>
   );

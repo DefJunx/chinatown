@@ -24,6 +24,19 @@ export interface Order {
   createdAt: number;
   forks?: number;
   chopsticks?: number;
+  userId?: string; // Link to user who placed the order
+}
+
+export interface UserProfile {
+  id: string;
+  userId: string; // InstantDB auth user ID
+  email: string;
+  firstName: string;
+  lastName: string;
+  preferredCutlery: "forks" | "chopsticks" | "none";
+  isAdmin: boolean;
+  createdAt: number;
+  updatedAt: number;
 }
 
 export interface ConsolidatedOrder {
