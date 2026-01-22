@@ -4,13 +4,20 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { db } from "@/lib/instant";
 import { Settings } from "lucide-react";
+import type { UserProfile } from "@/types";
 
 export function AdminFloatingButton() {
   const router = useRouter();
   const { isLoading, user } = db.useAuth();
+  const { data: profileData, isLoading: profileLoading } = db.useQuery(
+    user ? { userProfiles: { $: { where: { userId: user.id } } } } : null
+  );
 
-  // Only show button if user is authenticated (admin)
-  if (isLoading || !user) {
+  const profile = (profileData?.userProfiles?.[0] as UserProfile) || null;
+  const isAdmin = profile?.isAdmin || false;
+
+  // Only show button if user is authenticated and is an admin
+  if (isLoading || profileLoading || !user || !isAdmin) {
     return null;
   }
 

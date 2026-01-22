@@ -1,11 +1,25 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { MenuGrid } from "@/components/MenuGrid";
 import { db } from "@/lib/instant";
+import { toast } from "sonner";
 
 export default function HomePage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { data, isLoading } = db.useQuery({ systemSettings: {} });
+
+  // Check for unauthorized access redirect
+  useEffect(() => {
+    const unauthorized = searchParams.get("unauthorized");
+    if (unauthorized === "true") {
+      toast.error("Accesso negato. Non hai i permessi per accedere all'area amministrativa.");
+      // Clean up the URL by removing the query parameter
+      router.replace("/", { scroll: false });
+    }
+  }, [searchParams, router]);
 
   // Wait for data to load before rendering to prevent flicker
   if (isLoading) {

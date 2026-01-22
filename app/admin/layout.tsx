@@ -68,8 +68,8 @@ export default function AdminLayout({
 
       // Check if user is actually an admin
       if (!userProfile.isAdmin) {
-        // Not an admin, redirect to customer area
-        router.push("/");
+        // Not an admin, redirect to customer area with error flag
+        router.push("/?unauthorized=true");
         return;
       }
     }

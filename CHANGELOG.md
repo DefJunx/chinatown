@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2025-12-05
+
+### Changed
+
+- **Admin Access Control**
+  - Enhanced unauthorized access handling for non-admin users attempting to access admin area
+  - Added toast notification when unauthorized access is detected
+  - Improved redirect flow with error flag for better user feedback
+  - AdminFloatingButton now properly checks admin status before displaying
+
+### Fixed
+
+- Fixed AdminFloatingButton showing for non-admin authenticated users
+- Fixed missing user feedback when non-admin users are redirected from admin area
+
+---
+
 ## [1.6.0] - 2025-12-05
 
 ### Added
