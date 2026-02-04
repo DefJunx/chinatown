@@ -12,6 +12,7 @@
     "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,md}\""
   },
   "dependencies": {
+    "@instantdb/admin": "^0.22.121",
     "@instantdb/react": "^0.14.2",
     "lucide-react": "^0.460.0",
     "next": "15.0.5",

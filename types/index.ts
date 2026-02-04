@@ -35,6 +35,7 @@ export interface UserProfile {
   lastName: string;
   preferredCutlery: "forks" | "chopsticks" | "none";
   isAdmin: boolean;
+  slackUserId?: string; // Slack user ID for /ordina command integration
   createdAt: number;
   updatedAt: number;
 }

@@ -63,6 +63,7 @@ export default function ProfilePage() {
           lastName,
           preferredCutlery,
           isAdmin: existingProfile?.isAdmin || false, // Preserve admin status or default to false
+          slackUserId: existingProfile?.slackUserId, // Preserve Slack user ID
           createdAt: existingProfile?.createdAt || now,
           updatedAt: now,
         }),
