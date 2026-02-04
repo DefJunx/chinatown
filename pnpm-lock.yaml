@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@instantdb/admin':
+        specifier: ^0.22.121
+        version: 0.22.121
       '@instantdb/react':
         specifier: ^0.14.2
         version: 0.14.30(react@19.2.0)
@@ -238,13 +241,22 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@instantdb/admin@0.22.121':
+    resolution: {integrity: sha512-jPWBOp473MarQ1otWM/JzIRYGczQDQLOmq851vVawZ7BbeJH800iADvBNapt71eTZXdxSalj18/JCZgfoNQ0BQ==}
+
   '@instantdb/core@0.14.30':
     resolution: {integrity: sha512-x2RIfZH3///eQfv7bS6EWVAfvUbCo/EXW3UzC8XStNEPzgWm0YPvFupBKIdGZl+N2jcSqT0tuP5F6fGhG9RFhA==}
+
+  '@instantdb/core@0.22.121':
+    resolution: {integrity: sha512-cihZ4mW5+A79oaET9oUxLzsBFhNRHTthGay2KBG3/gHsHD4p98Z1OJAhg9+qcMaaNhNX4KulonzndeS1mhpGIg==}
 
   '@instantdb/react@0.14.30':
     resolution: {integrity: sha512-SfIxP9TWMqf8/rhBgVLaEo/Jf72pBsEgFiLt4nQj3HrYl3c79bjlt5us06Vx9t7XuOX2wQ0aPjLmQOW4wgkLNg==}
     peerDependencies:
       react: '>=16'
+
+  '@instantdb/version@0.22.121':
+    resolution: {integrity: sha512-dHY6Pm9aMN8saqLnknWYHyUafXmZdvIEeIu3gEYK6se3nsHvVZ2pINZ7vVBk7Pc+D7DmXXBxCWSIYL/DuYW7sQ==}
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -698,6 +710,10 @@ packages:
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
 
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
+
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -932,6 +948,14 @@ packages:
   esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
+
+  eventsource-parser@3.0.6:
+    resolution: {integrity: sha512-Vo1ab+QXPzZ4tCa8SwIHJFaSzy4R6SHf7BY79rFBDf0idraZWAkYrDjDj8uWaSm3S2TK+hJ7/t1CEmZ7jXw+pg==}
+    engines: {node: '>=18.0.0'}
+
+  eventsource@4.1.0:
+    resolution: {integrity: sha512-2GuF51iuHX6A9xdTccMTsNb7VO0lHZihApxhvQzJB5A03DvHDd2FQepodbMaztPBmBcE/ox7o2gqaxGhYB9LhQ==}
+    engines: {node: '>=20.0.0'}
 
   fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
@@ -1852,6 +1876,10 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
+  uuid@11.1.0:
+    resolution: {integrity: sha512-0/A9rDy9P7cJ+8w1c9WD9V//9Wj15Ce2MPz8Ri6032usz+NfePxx5AcN3bN+r6ZL6jEo066/yNYB3tn4pQEx+A==}
+    hasBin: true
+
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
@@ -2037,15 +2065,31 @@ snapshots:
   '@img/sharp-win32-x64@0.33.5':
     optional: true
 
+  '@instantdb/admin@0.22.121':
+    dependencies:
+      '@instantdb/core': 0.22.121
+      '@instantdb/version': 0.22.121
+      cookie: 1.1.1
+      eventsource: 4.1.0
+      uuid: 11.1.0
+
   '@instantdb/core@0.14.30':
     dependencies:
       mutative: 1.3.0
       uuid: 9.0.1
 
+  '@instantdb/core@0.22.121':
+    dependencies:
+      '@instantdb/version': 0.22.121
+      mutative: 1.3.0
+      uuid: 11.1.0
+
   '@instantdb/react@0.14.30(react@19.2.0)':
     dependencies:
       '@instantdb/core': 0.14.30
       react: 19.2.0
+
+  '@instantdb/version@0.22.121': {}
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -2510,6 +2554,8 @@ snapshots:
 
   concat-map@0.0.1: {}
 
+  cookie@1.1.1: {}
+
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -2883,6 +2929,12 @@ snapshots:
   estraverse@5.3.0: {}
 
   esutils@2.0.3: {}
+
+  eventsource-parser@3.0.6: {}
+
+  eventsource@4.1.0:
+    dependencies:
+      eventsource-parser: 3.0.6
 
   fast-deep-equal@3.1.3: {}
 
@@ -3856,6 +3908,8 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
+
+  uuid@11.1.0: {}
 
   uuid@9.0.1: {}
 
